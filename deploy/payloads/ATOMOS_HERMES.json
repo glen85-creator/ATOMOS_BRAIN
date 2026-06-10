@@ -1,0 +1,14 @@
+{
+  "status": "paused",
+  "budgetMonthlyCents": 500,
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash",
+    "toolsets": "terminal",
+    "persistSession": true,
+    "timeoutSec": 300,
+    "hermesCommand": "/paperclip/.local/bin/hermes",
+    "promptTemplate": "<KEEP-EXISTING — fetch 결과 agents-snapshot.json 의 현행 promptTemplate(S1 실증 제네릭 실행 페르소나)을 그대로 복사해 채울 것. 누락 시 sync-roster.sh 가 적용을 차단함>"
+  }
+}

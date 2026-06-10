@@ -1,0 +1,14 @@
+# ATOMOS_CEO — Paperclip PATCH 페이로드 원본
+slot: ATOMOS_CEO
+uuid: 5e2ad936-b073-4ea5-9bba-d6852db88cb3
+adapterType: hermes_local
+adapterConfig:
+  provider: openrouter
+  model: moonshotai/kimi-k2.6            # 활성화 전 hermes chat 1회 실측 필수 (deploy/README)
+  toolsets: terminal
+  persistSession: true
+  timeoutSec: 300
+  hermesCommand: /paperclip/.local/bin/hermes
+budgetMonthlyCents: 0                     # 승격(S2+) 시 2000 ($20)
+status: paused
+reportsTo: null

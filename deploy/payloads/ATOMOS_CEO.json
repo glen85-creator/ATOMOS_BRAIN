@@ -1,0 +1,13 @@
+{
+  "status": "paused",
+  "budgetMonthlyCents": 0,
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "provider": "openrouter",
+    "model": "moonshotai/kimi-k2.6",
+    "toolsets": "terminal",
+    "persistSession": true,
+    "timeoutSec": 300,
+    "hermesCommand": "/paperclip/.local/bin/hermes"
+  }
+}

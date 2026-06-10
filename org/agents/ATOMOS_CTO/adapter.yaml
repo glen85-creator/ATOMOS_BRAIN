@@ -1,0 +1,14 @@
+# ATOMOS_CTO — Paperclip PATCH 페이로드 원본
+slot: ATOMOS_CTO
+uuid: 1e8561b3-3939-4b51-ad82-4690acb8ae73
+adapterType: hermes_local
+adapterConfig:
+  provider: openrouter
+  model: deepseek/deepseek-v4-flash
+  toolsets: terminal
+  persistSession: true
+  timeoutSec: 300
+  hermesCommand: /paperclip/.local/bin/hermes
+budgetMonthlyCents: 0                     # routine 가동(S2+) 시 500 ($5)
+status: paused
+reportsTo: 5e2ad936-b073-4ea5-9bba-d6852db88cb3   # ATOMOS_CEO
