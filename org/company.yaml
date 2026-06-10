@@ -1,0 +1,33 @@
+# ATOMOS_OFFICE 회사 메타 (정본)
+# 시크릿 금지 — 식별자·정책 플래그만.
+
+company:
+  name: ATOMOS
+  paperclip_company_id: 88adce92-bd11-4655-a70a-05d728861c3a
+  admin_email: glen_85@hbscom.com
+
+infra:
+  vps_host: paperclip-host            # Hostinger Docker (2vCPU/8GB/GPU없음)
+  paperclip_container: paperclip-sab7-paperclip-1
+  paperclip_version: "2026.517.0"
+  paperclip_port: 54501               # 내부 :3100
+  hermes_binary: /paperclip/.local/bin/hermes   # v0.15.1 (hermes_local 어댑터가 spawn)
+  provider: openrouter                # GPU 없음 → 클라우드 라우팅 확정 (S0)
+
+engine_api:
+  base: https://fastapi-production-3c6e.up.railway.app
+  endpoints: /api/atomic/engine/*     # X-Engine-Token (ATOMIC_ENGINE_TOKEN) fail-closed
+  token_location:
+    vps: /root/.atomos/engine_token
+    railway_env: ATOMIC_ENGINE_TOKEN
+
+governance:                            # ADR 2026-06-03 분할 모델
+  admission_gate: app                  # risk/confidence — FastAPI autonomy_policy
+  execution_governance: paperclip      # 슬롯 월예산(budgetMonthlyCents) 실행시점 강제
+  spine: strategy_executions           # 1 execution ↔ 1 paperclip_issue_id
+
+policies:
+  wake_model: issue-driven             # 상시 폴링 금지, 작업 후 재-pause
+  escalation_hardcap_pct: 5            # 상위 tier 재시도 ≤5%
+  pii_mask_required: true              # mask.ts 선행, PII 작업 무료티어 금지
+  est_cost_currency: USD               # KRW 착각 방지 (S1 사고 승계)
