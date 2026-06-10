@@ -52,6 +52,22 @@ docker exec -u node paperclip-sab7-paperclip-1 \
 # (fetch-vps-bundles.sh 재실행 → agents-snapshot.json 에서 adapterType/model/status 확인)
 ```
 
+### ⑥ M4 — ATOMOS_ANALYST 승격 (M2 완료 후, 사용자 결정분)
+```bash
+# 0. 신규 모델 슬러그 실측 (필수 — Sonnet 4.6 호출이 실제로 되는지)
+docker exec -u node paperclip-sab7-paperclip-1 \
+  /paperclip/.local/bin/hermes chat -q "ping" -Q --provider openrouter
+#    (모델 지정 옵션은 hermes chat --help 로 확인 후 anthropic/claude-sonnet-4.6 으로 1회 실측)
+# 1. 검토
+./promote-analyst.sh            # dry-run
+# 2. 적용 — 모델 Sonnet 4.6 + 월예산 $10. status 는 paused 유지 (on-demand 원칙)
+./promote-analyst.sh --apply
+# 3. 일감 연결 — Railway 환경변수 ATOMOS_AGENT_ID 를 ANALYST UUID 로 변경
+#    (브리지가 매출 이슈를 HERMES 대신 ANALYST 에 배정하게 됨. 브리지 OFF 면 자동 일감 없음)
+```
+- "승격 = un-pause" 가 아니다. wake 모델이 issue-driven 이므로 승격 후에도 평시 paused·비용 0,
+  브리지(또는 수동 wakeup)가 이슈를 배정할 때만 기상한다.
+
 ## 안전 규칙
 - **un-pause 금지** — 모든 활성화는 브리지(on-demand) 또는 사람의 명시 결정
 - payload 에 `<KEEP-EXISTING>` 플레이스홀더가 남아 있으면 sync-roster.sh 가 적용을 차단

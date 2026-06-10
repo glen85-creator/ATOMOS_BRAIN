@@ -1,0 +1,13 @@
+{
+  "status": "paused",
+  "budgetMonthlyCents": 1000,
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4.6",
+    "toolsets": "terminal",
+    "persistSession": true,
+    "timeoutSec": 300,
+    "hermesCommand": "/paperclip/.local/bin/hermes"
+  }
+}
