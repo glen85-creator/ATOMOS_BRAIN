@@ -266,6 +266,13 @@ Paperclip에 "N분마다 전 에이전트 기상" 루프는 **없다**. wake는 
 
 ### 7-3. 브리지 서비스화 🟡
 
+> **개정 (2026-06-10, enrich 전환)**: FastAPI main에 **B층**(`tasks.auto_detect_sales` 05:30 —
+> 감지 즉시 규칙 기반 pending 제안 생성, feat/domain-auto-trigger)이 머지되면서 위임 단계의 구조가 2층이 됐다.
+> 브리지는 **신규 제안을 만들지 않고 B층이 만든 행을 보강(enrich)** 한다: B층 카드(05:30, canned 액션)
+> → 브리지(06:00)가 Paperclip AI 분석으로 같은 행의 ai_recommendation 교체 + paperclip_issue_id 링크.
+> 중복이 구조적으로 불가능하며 "1 execution ↔ 1 Paperclip 이슈" 스파인 원칙이 같은 행 위에서 성립한다.
+> 상세: `bridge/README.md` / FastAPI `FEATURES.md` §10.
+
 현재 수동 스크립트(`~/atomic-s1-exec/*.sh`)를 **FastAPI Celery 태스크로 승격**한다. 🔴 위치 최종확정 §13-4
 
 - **권고 근거**: 감지 캐시·detection_settings·엔진 EP·Redis/beat 인프라가 전부 FastAPI(Railway)에 있음. VPS 상주 데몬은 단일실패점+패치휘발 리스크.
