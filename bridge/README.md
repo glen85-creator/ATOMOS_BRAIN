@@ -30,6 +30,7 @@ Celery beat (매일 06:00 KST — refresh-aggregates 05:00 후)
 | `ATOMOS_AGENT_ID` | `6d44aa65-…` (ATOMOS_HERMES) | 기본값 코드 내장 |
 | `ATOMOS_BRIDGE_ORG_ID` 또는 `ATOMOS_BRIDGE_BR_IDS` | 스캔 범위 | 미설정 시 사이클 스킵 (안전) |
 | `ATOMOS_BRIDGE_MAX_DISPATCH` | `2` | 사이클당 신규 디스패치 상한 (비용 가드) |
+| `ATOMOS_BRIDGE_SKIP_ZERO_SALES` | `true` | gross=0 critical 스킵 — 휴무/미수집/영업중단 의심은 운영 확인 대상 (AI 제안 부적합) |
 | `ATOMOS_BRIDGE_POLL_INTERVAL_SEC` / `ATOMOS_BRIDGE_POLL_TIMEOUT_SEC` | `20` / `600` | 코멘트 회수 폴링 |
 
 ## 가동 절차
