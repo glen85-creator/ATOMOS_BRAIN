@@ -142,11 +142,33 @@ S0 설계의 "팀원 = 원격 hermes-agent 컨테이너의 profiles 4개(atomos-
 
 *구 DESIGNER_IMAGE/VIDEO → CONTENTS_STUDIO 흡수. 구 ATOMOS_VISION → VISION_AI_TEAM 리네임.*
 
-### 3-3. 활성화 원칙 — 린 스타트 (✅ S1 결정 승계)
+### 3-3. 활성화 원칙 — 린 스타트 (✅ S1 승계 + 🟡 13슬롯 갱신)
 
-- **v1 = ATOMOS_HERMES 단일 활성** (on-demand: 평시 paused, 브리지가 wakeup → 작업 → 재-pause).
-- **승격 게이트** 🟡: 슬롯 활성화는 ①해당 도메인 `data_status=available` ② `tool_readiness≥partial` ③ 월 5건 이상 해당 도메인 이슈 발생 ④ 슬롯 예산 책정 — 4조건 충족 시. 승격 순서: ANALYST → MARKETING → CEO(다중 슬롯 조율이 필요해지는 시점) → 나머지.
-- **codex_local 3슬롯(ANALYST/RESEARCHER/MARKETING)은 hermes_local로 전환** 🟡 — terminal-native 실증 경로 통일 + provider 키 1원화(OpenRouter). 🔴 §13-3
+- **타깃 로스터 정식화**: 13슬롯을 헌장에 박되, 각 팀 instruction 4파일(SOUL/AGENTS/TOOLS/HEARTBEAT)+adapter.yaml+Paperclip provision은 **그 팀 활성화 시** 작성(현 6슬롯만 `org/agents/` 존재).
+- **v1 활성**: ANALYST(sales, 2026-06-12 skeleton 실증) + HERMES(범용 폴백 on-demand). 나머지 paused/not-created = $0.
+- **승격 게이트**: ①도메인 `data_status=available` ②`tool_readiness≥partial` ③월 5건↑ 이슈 ④예산 책정. 순서(`roster.yaml` promotion_order): ANALYST(완료)→MARKETING→SCM→FINANCE→RESEARCHER→BRAND_DIVISION→CTO→CEO→CONTENTS→CRM→VISION→ARCHIVES.
+- **관리자 노드**(BRAND_DIVISION·CTO)는 산하 위임 시 활성 필요 — 산하 팀 승격과 함께.
+- **codex_local 잔재**(MARKETING·RESEARCHER)는 활성화 시 hermes_local 전환.
+
+### 3-4. 감지 도메인 → 담당 팀 (라우팅 입력) 🟡
+
+| 감지 도메인 | 담당 팀 | 협업 (fan-out 힌트) | 현 감지 상태 |
+|---|---|---|---|
+| sales 매출급락 | ANALYST | — | 라이브·디스패치 ✅ |
+| cogs 원가·공급가급등 | SCM_TEAM | P&L=ANALYST | 감지 ✅·디스패치 ✗ |
+| cost 공과금·계약만료 | FINANCE_TEAM | 계약 리서치=RESEARCHER | 감지 ✅·디스패치 ✗ |
+| review 평판 | MARKETING | 고객 발송=CRM | 감지 ✅·디스패치 ✗ |
+| opportunity 기회 | (보류) | — | 코드 실체 없음 |
+
+→ (b) 다음 레이어가 이 매핑으로 `elayer_dispatch.py`의 sales→ANALYST 하드코딩을 도메인→슬롯 테이블로 대체. 미활성 도메인은 HERMES 폴백 or skip.
+
+### 3-5. 발송 게이트 (draft-only) 🟡
+
+CRM(카카오)·FINANCE(손익서)·CONTENTS(실물 발주)는 `send_gate: needs_external`. 외부 발송 권한 Pack 승격 전까지 **초안 전용** — 산출물은 검토용 초안까지, 실제 발송은 Pack 충족 후. (헌장 "발송 금지·초안만" 정책 §11 준수)
+
+### 3-6. ARCHIVES retrieval 🔴
+
+terminal 전용이라 런타임 위키 pull 불가 → ARCHIVES는 **1단계 쓰기전용 기록자**(사건·산출물 로깅)로 출범. 읽기는 (a)FastAPI retrieval API or (b)CTO/DB 위임 — 후속(§13-11). GLEN_WORK 세컨드브레인과 역할 경계 후속.
 
 ---
 
