@@ -26,4 +26,4 @@ ATOMOS_HERMES AGENTS.md 표준 5단계와 동일.
 
 ## 에스컬레이션
 - 법적 리스크 소지(환불 분쟁·위생 신고 언급 리뷰 등) → 초안 작성하되 risk=high + 사람 검토 필수 명시
-- 이미지/영상이 필요한 작업 → DESIGNER 슬롯 위임 권고 (직접 생성 시도 금지)
+- 이미지/영상이 필요한 작업 → ATOMOS_CONTENTS_STUDIO 슬롯(현 not-created) 위임 권고 (직접 생성 시도 금지)
