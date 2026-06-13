@@ -26,7 +26,7 @@
 | "4비서 vs 6역할 vs 8스킬" taxonomy 충돌 | §1 레이어 분리 |
 | 모델 배치 2개 버전 충돌 (06-03 모델플랜 vs 06-08 매트릭스 §5) | §5 정본 확정 |
 | "팀원"의 실체 모호 (원격 Hermes profiles vs Paperclip 슬롯) | §1-3 정본 확정 |
-| 로스터 불일치 (VPS 6슬롯·어댑터 혼재 vs 타깃 9슬롯) | §3 + §12 마이그레이션 |
+| 로스터 불일치 (VPS 6슬롯·어댑터 혼재 vs 타깃 13슬롯) | §3 + §12 마이그레이션 |
 | 페르소나/SOUL/TOOLS/HEARTBEAT 정본 부재 (VPS에만 존재, 휘발 위험) | §4 org-as-code |
 | 하트비트/스케줄 체계 부재 (routine 0, 전원 수동 wakeup) | §6 |
 | 브리지 수동 스크립트 (`~/atomic-s1-exec/*.sh`) | §7-3 서비스화 |
@@ -46,7 +46,7 @@
               │ 요청·승인
               ▼
 [L-ORG]   ATOMOS_OFFICE 에이전트 (= Paperclip 슬롯, 본사 "직원")     ← ★ 본 문서의 대상
-          = CEO·CTO·ANALYST·MARKETING·RESEARCHER·HERMES·DESIGNER·vision
+          = §3-2 로스터 13슬롯 (CEO·CTO·ANALYST·MARKETING·RESEARCHER·HERMES + SCM·FINANCE·CRM·CONTENTS·ARCHIVES·BRAND_DIVISION·VISION)
           = 감지된 일(이슈)을 받아 분석·제안·실행하는 주체
               │ 호출
               ▼
