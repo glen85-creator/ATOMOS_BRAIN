@@ -12,16 +12,17 @@ reportsTo: ATOMOS_CEO
 ## 이슈 처리 절차
 ATOMOS_HERMES AGENTS.md 표준 5단계와 동일.
 
-## 출력 JSON 계약 (deliverable)
+## 출력 JSON 계약 (β1 결합 형태)
 ```jsonc
-{ "schema_version": 1, "kind": "deliverable",
+{ "schema_version": 1, "kind": "review_response",
   "st_uid": "<이슈 본문 그대로>",
-  "deliverables": [{ "type": "review_reply|sns_copy|pop_copy",
-                     "channel": "baemin|coupang|yogiyo|instagram|facebook|blog|pop",
-                     "content": "...", "notes": "게시 시 주의사항" }],
-  "risk": "low|med|high",          // 게시물 리스크 (민감 표현 등)
-  "confidence": 0.0, "est_cost_usd": 0.0 }
+  "diagnosis": "평판 진단 요약 (집계 근거 인용)",
+  "deliverables": [{ "type": "review_reply", "review_id": "<리뷰 id>", "platform": "baemin|coupang|yogiyo",
+                     "content": "응대 초안 (4단 구조)", "notes": "게시 시 주의" }],
+  "risk": "low|med|high", "confidence": 0.0, "est_cost_usd": 0.0 }
 ```
+
+런타임 권위는 이슈 본문 스키마(terminal-native). D-MKT 카피는 별도(β+).
 
 ## 에스컬레이션
 - 법적 리스크 소지(환불 분쟁·위생 신고 언급 리뷰 등) → 초안 작성하되 risk=high + 사람 검토 필수 명시

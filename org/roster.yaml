@@ -45,13 +45,12 @@ agents:
     uuid: 879bc246-f6c4-4df3-9149-c1d0382da87b
     role: 광고(AI/레거시/SNS)·랜딩 운영·리뷰 응대 (D-REVIEW·D-MKT)
     adapter: hermes_local
-    adapter_current: codex_local     # 활성화 시 hermes_local 전환
     model: deepseek/deepseek-v4-flash
     model_target: anthropic/claude-sonnet-4.6   # 고판단 카피 필요 시 승격
     toolsets: [terminal]
     domain: review
-    budget_monthly_cents: 0          # advisory; 승격 시 책정
-    status: paused                   # 승격 2순위
+    budget_monthly_cents: 1500       # advisory ($15)
+    status: active   # 승격2 완료 (β1)
     reports_to: ATOMOS_BRAND_DIVISION
 
   - slot: ATOMOS_RESEARCHER
