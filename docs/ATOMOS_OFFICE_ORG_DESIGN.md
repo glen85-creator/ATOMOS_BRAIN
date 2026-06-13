@@ -96,38 +96,51 @@ S0 설계의 "팀원 = 원격 hermes-agent 컨테이너의 profiles 4개(atomos-
 
 ## 3. 조직 구조 (정본 로스터)
 
-### 3-1. 조직도 🟡
+### 3-1. 조직도 🟡 (13슬롯, 2계층)
 
 ```
-                    ┌─────────────────┐
-   [앱 Admission    │   ATOMOS_CEO    │  오케스트레이터 (조율만, 실행 금지)
-    Gate 통과분만   │  (총괄 두뇌)    │  risk/confidence 태깅 책임
-    이슈로 유입]    └────────┬────────┘
-         ┌───────────┬──────┼──────────┬───────────┬───────────┐
-         ▼           ▼      ▼          ▼           ▼           ▼
-   ATOMOS_ANALYST  ATOMOS_  ATOMOS_   ATOMOS_    ATOMOS_    ATOMOS_CTO
-   (분석)          MARKETING RESEARCHER DESIGNER   HERMES     (기술·어댑터·
-   D-SALES·COGS·   (창작·SNS) (시장·상권) (이미지/영상) (통합 실행·  조직 정비)
-   COST 진단       D-REVIEW·  외부 정보   D-MKT 산출  브리지 보조)
-                   D-MKT 응대
-                                      + vision 슬롯 (D-CONTRACT OCR — S3 후반)
+                         ┌─────────────────┐
+   [앱 Admission Gate    │   ATOMOS_CEO    │  오케스트레이터·영업 첫 관문
+    통과분만 이슈 유입]   │  (총괄 두뇌)    │  (조율만·실행 금지, 2+도메인 분해)
+                         └────────┬────────┘
+        ┌──────────┬──────────┬───┴────┬──────────┬──────────┬──────────┐
+        ▼          ▼          ▼        ▼          ▼          ▼          ▼
+   ATOMOS_CTO  BRAND_      ANALYST  RESEARCHER CRM_TEAM   SCM_TEAM   FINANCE_TEAM
+   (기술·DB·   DIVISION    [sales]  (상권·시장) (메시지·   [cogs]     [cost]
+    API)       (브랜드우산)  진단              카카오·draft) 식자재     회계·손익·draft
+        │          │
+        ▼      ┌───┴────────┐
+   ARCHIVES_   ▼            ▼
+   TEAM     MARKETING   CONTENTS_STUDIO
+   (기록·    [review]    (콘텐츠·발주·draft
+    WIKI·    광고·응대     구 DESIGNER 흡수)
+    쓰기전용)
+
+   + ATOMOS_HERMES (범용 폴백 — 미활성 도메인 임시·긴급, CEO 직속·상시 on-demand)
+   + ATOMOS_VISION_AI_TEAM (카메라·OCR — not-created, CEO 직속)
 ```
 
-### 3-2. 캐노니컬 로스터 — 9슬롯 (✅ 매트릭스 §5 채택 + 🟡 보강)
+### 3-2. 캐노니컬 로스터 — 13슬롯 (🟡 2026-06-13 org 정식화)
 
-모델 배치는 **매트릭스 설계 §5(2026-06-08)를 정본**으로 한다. `HERMES_AI_HQ_MODEL_PLAN.md`(06-03)는 **예산 산출 참고 문서로 격하** (§5-4).
+모델 배치 기본은 매트릭스 §5 승계, 비용 최소화로 deepseek-v4-flash 디폴트. 상세 메타는 `org/roster.yaml`.
 
-| # | 슬롯 | 담당 도메인/일 | 권장 모델 | 저가 대안 | Provider | v1 상태 |
+| # | 슬롯 | reports_to | 담당 도메인 | 운영 모델 (타깃) | v1 상태 | 발송 |
 |---|---|---|---|---|---|---|
-| 1 | ATOMOS_CEO | 오케스트레이션·태깅·조율 | `moonshotai/kimi-k2.6` | deepseek-v4-flash | OpenRouter | paused (S2+) |
-| 2 | ATOMOS_CTO | 기술판단·조직 정비 | `deepseek/deepseek-v4-flash` | — | OpenRouter | paused |
-| 3 | **ATOMOS_HERMES** | 통합 실행 (범용 일꾼) | Claude Sonnet 4.6 | **deepseek-v4-flash (v1 현행)** | OpenRouter | **active(on-demand)** |
-| 4 | ATOMOS_ANALYST | D-SALES·D-COGS·D-COST 진단 | Claude Sonnet 4.6 | deepseek-v4-flash | OpenRouter | **S1+ 승격 1순위** |
-| 5 | ATOMOS_MARKETING | D-REVIEW 응대·D-MKT 카피 | Claude Sonnet 4.6 | Gemini 3.1 Flash-Lite | OpenRouter | 승격 2순위 |
-| 6 | ATOMOS_RESEARCHER | 상권·시장·웹 리서치 | Gemini 3 Flash | Gemini 3.1 Flash-Lite | OpenRouter | paused |
-| 7 | ATOMOS_DESIGNER(이미지) | D-MKT 이미지 산출 | Nano Banana 2 | Seedream v5 Lite | Google/fal Pack | 미생성 (외부 API 게이트) |
-| 8 | ATOMOS_DESIGNER(영상) | D-MKT 영상 산출 | Veo 3.1 Fast | Kling 3.0 | Google/fal Pack | 미생성 (외부 API 게이트) |
-| 9 | vision 슬롯 | D-CONTRACT OCR·검침 | Gemini 3 Flash | GLM-OCR | Google Pack | 미생성 (S3 후반) |
+| 1 | ATOMOS_CEO | — | 2+도메인 분해 | kimi-k2.6 | paused | — |
+| 2 | ATOMOS_CTO | CEO | 운영 health | deepseek-v4-flash | paused | — |
+| 3 | ATOMOS_ARCHIVES_TEAM | CTO | 전 사건 기록 | deepseek-v4-flash | not-created | 쓰기전용 |
+| 4 | ATOMOS_BRAND_DIVISION | CEO | MKT/CONTENTS 조율 | deepseek-v4-flash | not-created | — |
+| 5 | ATOMOS_MARKETING | BRAND_DIVISION | review | deepseek (→sonnet-4.6) | paused (승격2) | — |
+| 6 | ATOMOS_CONTENTS_STUDIO | BRAND_DIVISION | MKT 산출 실물화 | deepseek +nano-banana-2/veo-3.1 | not-created | needs_external |
+| 7 | ATOMOS_RESEARCHER | CEO | cost·cogs 협업 | gemini-3-flash | paused | — |
+| 8 | ATOMOS_CRM_TEAM | CEO | review 협업 | deepseek-v4-flash | not-created | needs_external |
+| 9 | ATOMOS_SCM_TEAM | CEO | cogs | deepseek-v4-flash | not-created | — |
+| 10 | ATOMOS_FINANCE_TEAM | CEO | cost | deepseek-v4-flash | not-created | needs_external |
+| 11 | ATOMOS_ANALYST | CEO | sales | deepseek-v4-flash (→sonnet-4.6) | **active (승격1 완료)** | — |
+| 12 | ATOMOS_HERMES | CEO | 미활성 도메인 폴백 | deepseek-v4-flash | active-on-demand | — |
+| 13 | ATOMOS_VISION_AI_TEAM | CEO | contract OCR | gemini-3-flash | not-created | — |
+
+*구 DESIGNER_IMAGE/VIDEO → CONTENTS_STUDIO 흡수. 구 ATOMOS_VISION → VISION_AI_TEAM 리네임.*
 
 ### 3-3. 활성화 원칙 — 린 스타트 (✅ S1 결정 승계)
 
