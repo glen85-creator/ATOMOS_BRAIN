@@ -1,104 +1,174 @@
 # ATOMOS_OFFICE 캐노니컬 로스터 (조직 헌장 §3-2의 기계가독본 — deploy 입력)
-# 모델 정본 = 매트릭스 설계 §5 (2026-06-08). status는 현행 운영 상태.
-# budget_monthly_cents = Paperclip 실행시점 강제 예산.
+# 13슬롯 정식화 (2026-06-13): 글렌 11팀 도면 + ANALYST(진단 유지) + HERMES(폴백).
+# ⚠️ budget_monthly_cents 정책 = advisory (noise 위). 실비용 SoT = 우리 agent_run.
+#   (Paperclip COST_REGEX가 proposal의 est_cost_usd를 LLM 지출로 오긁어 가짜 정지 유발 → 신뢰 안 함.
+#    실제 캡 = 앱쪽 autonomy cost_ceiling.) paused/not-created = $0.
+# domain = 담당 감지 도메인(라우팅 입력). send_gate=needs_external → 외부 Pack 승격 전 draft-only.
+# lean-start: 신규 슬롯 instruction 4파일·provision은 활성화 시 작성(현 6슬롯만 org/agents/ 존재).
 
 agents:
+  # ── 기존 6슬롯 (provisioned) ──
   - slot: ATOMOS_CEO
     uuid: 5e2ad936-b073-4ea5-9bba-d6852db88cb3
-    role: 오케스트레이터 (조율만, 실행 금지 — risk/confidence 태깅 책임)
+    role: 오케스트레이터·영업 첫 관문 (조율만, 실행 금지 — risk/confidence 태깅 + 2+도메인 분해)
     adapter: hermes_local
     model: moonshotai/kimi-k2.6
     model_fallback: deepseek/deepseek-v4-flash
     toolsets: [terminal]
-    budget_monthly_cents: 0
-    status: paused                # S2+ 다중 슬롯 조율 필요 시점에 승격
+    budget_monthly_cents: 0          # advisory; 승격 시 책정
+    status: paused                   # 2+도메인 동시 분해 필요 시 승격 (최후)
     reports_to: null
 
   - slot: ATOMOS_CTO
     uuid: 1e8561b3-3939-4b51-ad82-4690acb8ae73
-    role: 기술판단·어댑터/조직 정비 (daily-health routine 담당)
+    role: 기술판단·DB·API·어댑터/조직 정비 (daily-health) + ARCHIVES 관리
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
     toolsets: [terminal]
-    budget_monthly_cents: 0
+    budget_monthly_cents: 0          # advisory
+    status: paused
+    reports_to: ATOMOS_CEO
+
+  - slot: ATOMOS_ANALYST
+    uuid: 87031503-057b-42d4-a3e3-12cebc70811b
+    role: D-SALES 진단 (P&L·유닛이코노믹스·KPI) — cogs/cost P&L 영향 협업
+    adapter: hermes_local
+    model: deepseek/deepseek-v4-flash       # v1 현행 (2026-06-12 skeleton 실증)
+    model_target: anthropic/claude-sonnet-4.6
+    toolsets: [terminal]
+    domain: sales
+    budget_monthly_cents: 100000     # advisory ($1000) — 실비용 SoT=agent_run
+    status: active                   # 승격 1순위 완료
+    reports_to: ATOMOS_CEO
+
+  - slot: ATOMOS_MARKETING
+    uuid: 879bc246-f6c4-4df3-9149-c1d0382da87b
+    role: 광고(AI/레거시/SNS)·랜딩 운영·리뷰 응대 (D-REVIEW·D-MKT)
+    adapter: hermes_local
+    adapter_current: codex_local     # 활성화 시 hermes_local 전환
+    model: deepseek/deepseek-v4-flash
+    model_target: anthropic/claude-sonnet-4.6   # 고판단 카피 필요 시 승격
+    toolsets: [terminal]
+    domain: review
+    budget_monthly_cents: 0          # advisory; 승격 시 책정
+    status: paused                   # 승격 2순위
+    reports_to: ATOMOS_BRAND_DIVISION
+
+  - slot: ATOMOS_RESEARCHER
+    uuid: 7329c63d-27e4-4e54-a592-edf8e3418a3b
+    role: 상권·시장·프랜차이즈·민관·소상공인 웹 리서치
+    adapter: hermes_local
+    adapter_current: codex_local
+    model: google/gemini-3-flash
+    model_fallback: google/gemini-3.1-flash-lite
+    toolsets: [terminal]
+    budget_monthly_cents: 0          # advisory
     status: paused
     reports_to: ATOMOS_CEO
 
   - slot: ATOMOS_HERMES
     uuid: 6d44aa65-3149-4a0a-a2d2-20de1805bf95
-    role: 통합 실행 (범용 일꾼) — S1 풀사이클 실증 완료
+    role: 범용 폴백 — 전문팀 미활성 도메인 임시 커버 + 미분류/긴급 작업
     adapter: hermes_local
-    model: deepseek/deepseek-v4-flash      # v1 현행. 타깃: Claude Sonnet 4.6
+    model: deepseek/deepseek-v4-flash
     model_target: anthropic/claude-sonnet-4.6
     toolsets: [terminal]
-    budget_monthly_cents: 500
-    status: active-on-demand      # 평시 paused, 브리지 wakeup → 작업 → 재-pause
+    budget_monthly_cents: 500        # advisory
+    status: active-on-demand         # 평시 paused, wakeup → 작업 → 재-pause
     reports_to: ATOMOS_CEO
 
-  - slot: ATOMOS_ANALYST
-    uuid: 87031503-057b-42d4-a3e3-12cebc70811b
-    role: D-SALES·D-COGS·D-COST 진단 (P&L·유닛이코노믹스·KPI)
-    adapter: hermes_local         # M2: codex_local → hermes_local 전환 (미결 #3)
-    adapter_current: codex_local
-    model: anthropic/claude-sonnet-4.6
-    model_fallback: deepseek/deepseek-v4-flash
-    toolsets: [terminal]
-    budget_monthly_cents: 0       # 승격 시 1000
-    status: paused                # 승격 1순위 (M4)
-    reports_to: ATOMOS_CEO
-
-  - slot: ATOMOS_MARKETING
-    uuid: 879bc246-f6c4-4df3-9149-c1d0382da87b
-    role: D-REVIEW 응대·D-MKT 카피 (SNS·크리에이티브)
-    adapter: hermes_local         # M2 전환 대상
-    adapter_current: codex_local
-    model: anthropic/claude-sonnet-4.6
-    model_fallback: google/gemini-3.1-flash-lite
-    toolsets: [terminal]
-    budget_monthly_cents: 0       # 승격 시 1500
-    status: paused                # 승격 2순위
-    reports_to: ATOMOS_CEO
-
-  - slot: ATOMOS_RESEARCHER
-    uuid: 7329c63d-27e4-4e54-a592-edf8e3418a3b
-    role: 상권·시장·웹 리서치 (수요/경쟁 매핑)
-    adapter: hermes_local         # M2 전환 대상
-    adapter_current: codex_local
-    model: google/gemini-3-flash
-    model_fallback: google/gemini-3.1-flash-lite
-    toolsets: [terminal]
-    budget_monthly_cents: 0
-    status: paused
-    reports_to: ATOMOS_CEO
-
-  # ── 미생성 슬롯 (외부 API 게이트 충족 시 생성 — 미결 #10) ──
-  - slot: ATOMOS_DESIGNER_IMAGE
-    role: D-MKT 이미지 산출
+  # ── 신규 6슬롯 (글렌 11팀 재설계 — not-created, 활성화 시 provision) ──
+  - slot: ATOMOS_ARCHIVES_TEAM
+    role: 사건 기록·LLM WIKI 관리·기록 정리 (1단계 쓰기전용 기록자)
     adapter: hermes_local
-    model: nano-banana-2          # Google/fal Pack
-    model_fallback: seedream-v5-lite
+    model: deepseek/deepseek-v4-flash
+    toolsets: [terminal]
+    budget_monthly_cents: 0          # advisory
+    status: not-created
+    reports_to: ATOMOS_CTO
+    notes: retrieval(읽기)은 후속 설계 — terminal 전용이라 런타임 위키 pull 불가
+
+  - slot: ATOMOS_BRAND_DIVISION
+    role: 브랜드·홍보 우산조직 — CEO 지시 받아 산하(MARKETING·CONTENTS) 분배·조율
+    adapter: hermes_local
+    model: deepseek/deepseek-v4-flash
+    toolsets: [terminal]
+    budget_monthly_cents: 0          # advisory
+    status: not-created
+    reports_to: ATOMOS_CEO
+    notes: 실제 라우팅 노드(중간관리) — 산하로 위임하려면 활성화 필요
+
+  - slot: ATOMOS_CONTENTS_STUDIO
+    role: 콘텐츠 생성·홍보물 실물 발주 (이미지/영상 — 구 DESIGNER_IMAGE/VIDEO 흡수)
+    adapter: hermes_local
+    model: deepseek/deepseek-v4-flash
+    model_image: nano-banana-2       # 활성화 시 Google/fal Pack
+    model_video: veo-3.1-fast
+    toolsets: [terminal]
+    send_gate: needs_external        # 실물 발주는 외부 Pack 승격 전 draft-only
+    budget_monthly_cents: 0          # advisory
+    status: not-created
+    reports_to: ATOMOS_BRAND_DIVISION
+
+  - slot: ATOMOS_CRM_TEAM
+    role: 메시지/카카오 발송·고객정보·패턴 분석
+    adapter: hermes_local
+    model: deepseek/deepseek-v4-flash
+    toolsets: [terminal]
+    send_gate: needs_external        # 카카오 발송은 외부 Pack 승격 전 draft-only
+    budget_monthly_cents: 0          # advisory
     status: not-created
     reports_to: ATOMOS_CEO
 
-  - slot: ATOMOS_DESIGNER_VIDEO
-    role: D-MKT 영상 산출
+  - slot: ATOMOS_SCM_TEAM
+    role: 식자재·시세·거래처 관리 (RESEARCH 협업)
     adapter: hermes_local
-    model: veo-3.1-fast           # Google/fal Pack
-    model_fallback: kling-3.0
+    model: deepseek/deepseek-v4-flash
+    toolsets: [terminal]
+    domain: cogs
+    budget_monthly_cents: 0          # advisory
     status: not-created
     reports_to: ATOMOS_CEO
 
-  - slot: ATOMOS_VISION
-    role: D-CONTRACT OCR·검침 (contract_extractor, vision_meter_read)
+  - slot: ATOMOS_FINANCE_TEAM
+    role: 매장 회계·손익계산서 발송 (cost 도메인)
+    adapter: hermes_local
+    model: deepseek/deepseek-v4-flash
+    toolsets: [terminal]
+    domain: cost
+    send_gate: needs_external        # 손익서 발송은 외부 Pack 승격 전 draft-only
+    budget_monthly_cents: 0          # advisory
+    status: not-created
+    reports_to: ATOMOS_CEO
+
+  # ── 미생성: 비전/외부 게이트 (글렌 "현재 개발 전") ──
+  - slot: ATOMOS_VISION_AI_TEAM      # 구 ATOMOS_VISION 승계
+    role: 카메라/비전·D-CONTRACT OCR·검침 (contract_extractor, vision_meter_read)
     adapter: hermes_local
     model: google/gemini-3-flash
     model_fallback: glm-ocr
-    status: not-created           # S3 후반
+    toolsets: [terminal]
+    budget_monthly_cents: 0          # advisory
+    status: not-created
     reports_to: ATOMOS_CEO
 
-promotion_gate:                   # 슬롯 활성화 4조건 (조직 헌장 §3-3)
+promotion_gate:                      # 슬롯 활성화 4조건 (조직 헌장 §3-3)
   - data_status == available
   - tool_readiness >= partial
   - monthly_issues >= 5
   - budget_assigned == true
-promotion_order: [ATOMOS_ANALYST, ATOMOS_MARKETING, ATOMOS_CEO]
+
+# 활성화 로드맵 (lean — 켤 때만 4파일+provision). HERMES는 상시 on-demand라 제외.
+promotion_order:
+  - ATOMOS_ANALYST          # 완료 (sales)
+  - ATOMOS_MARKETING        # review
+  - ATOMOS_SCM_TEAM         # cogs (감지 라이브)
+  - ATOMOS_FINANCE_TEAM     # cost (감지 라이브)
+  - ATOMOS_RESEARCHER       # cogs/cost 협업
+  - ATOMOS_BRAND_DIVISION   # MARKETING 활성 후 우산
+  - ATOMOS_CTO              # ARCHIVES 필요 시
+  - ATOMOS_CEO              # 2+도메인 분해 필요 시 (최후)
+  - ATOMOS_CONTENTS_STUDIO
+  - ATOMOS_CRM_TEAM
+  - ATOMOS_VISION_AI_TEAM
+  - ATOMOS_ARCHIVES_TEAM
