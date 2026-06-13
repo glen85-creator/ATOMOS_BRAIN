@@ -1,5 +1,5 @@
 # ATOMOS_MARKETING — Paperclip PATCH 페이로드 원본
-# ⚠️ 현행 adapterType=codex_local → hermes_local 전환 대상 (M2, 미결 #3 승인됨)
+# 승격2 완료 (β1) — hermes_local 전환 완료
 slot: ATOMOS_MARKETING
 uuid: 879bc246-f6c4-4df3-9149-c1d0382da87b
 adapterType: hermes_local
@@ -8,8 +8,8 @@ adapterConfig:
   model: deepseek/deepseek-v4-flash      # v1 저가 운영. 타깃: anthropic/claude-sonnet-4.6 / 대안 google/gemini-3.1-flash-lite
   toolsets: terminal
   persistSession: true
-  timeoutSec: 300
+  timeoutSec: 600
   hermesCommand: /paperclip/.local/bin/hermes
-budgetMonthlyCents: 0                     # 승격 시 1500 ($15)
-status: paused                            # 승격 2순위
+budgetMonthlyCents: 1500                  # 승격2 완료 ($15) — 디스패처가 idle↔paused 토글(resting paused=$0)
+status: paused                            # 승격2 완료 — 디스패처가 idle↔paused 토글(resting paused=$0)
 reportsTo: 5e2ad936-b073-4ea5-9bba-d6852db88cb3   # ATOMOS_CEO
