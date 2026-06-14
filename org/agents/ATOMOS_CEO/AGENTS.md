@@ -52,5 +52,7 @@ ATOMOS_HERMES와 동일 (§7-2). 단 `kind`에 `"dispatch_plan"` 허용:
   "rationale": "...", "risk": "low|med|high", "confidence": 0.0 }
 ```
 
-## 활성화 조건 (주의)
-이 슬롯은 **다중 슬롯 조율이 실제 필요해질 때까지 paused** (조직 헌장 §3-3, 비용 다이얼 — kimi 출력단가는 deepseek의 ~17배).
+## 모델·활성화 상태
+- **게이트 v1 활성** — E층 디스패치 게이트 담당(`status: active`). 모델 `deepseek/deepseek-v4-flash` (bake-off 5R 선정 — kimi는 JSON 트렁케이트로 게이트 부적합, gemini/qwen 등도 비교 후 deepseek 채택).
+- 평소 paused 상태로 대기하고 FastAPI 디스패처가 게이트마다 idle↔paused 토글로 깨운다(active-on-demand).
+- `model_target: qwen/qwen3.6-flash` — 후속으로 다중 슬롯 분해(dispatch_plan)까지 확장할 때의 승격 후보.
