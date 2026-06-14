@@ -78,26 +78,29 @@ agents:
 
   # ── 신규 6슬롯 (글렌 11팀 재설계 — not-created, 활성화 시 provision) ──
   - slot: ATOMOS_ARCHIVES_TEAM
+    uuid: bc4c5a0a-7626-4506-9958-d67a0938133c
     role: 사건 기록·LLM WIKI 관리·기록 정리 (1단계 쓰기전용 기록자)
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
     toolsets: [terminal]
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_CTO
     notes: retrieval(읽기)은 후속 설계 — terminal 전용이라 런타임 위키 pull 불가
 
   - slot: ATOMOS_BRAND_DIVISION
+    uuid: 2083c2fd-4b27-426c-8a4f-4bd4f8b26256
     role: 브랜드·홍보 우산조직 — CEO 지시 받아 산하(MARKETING·CONTENTS) 분배·조율
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
     toolsets: [terminal]
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_CEO
     notes: 실제 라우팅 노드(중간관리) — 산하로 위임하려면 활성화 필요
 
   - slot: ATOMOS_CONTENTS_STUDIO
+    uuid: 6fdf18c5-7ffc-48bd-84fd-785fb6008735
     role: 콘텐츠 생성·홍보물 실물 발주 (이미지/영상 — 구 DESIGNER_IMAGE/VIDEO 흡수)
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
@@ -106,30 +109,33 @@ agents:
     toolsets: [terminal]
     send_gate: needs_external        # 실물 발주는 외부 Pack 승격 전 draft-only
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_BRAND_DIVISION
 
   - slot: ATOMOS_CRM_TEAM
+    uuid: 6f620065-90d7-435c-bfcb-2676c4239765
     role: 메시지/카카오 발송·고객정보·패턴 분석
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
     toolsets: [terminal]
     send_gate: needs_external        # 카카오 발송은 외부 Pack 승격 전 draft-only
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_CEO
 
   - slot: ATOMOS_SCM_TEAM
+    uuid: cbc2768b-bb6f-4c09-878a-b127519e585a
     role: 식자재·시세·거래처 관리 (RESEARCH 협업)
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
     toolsets: [terminal]
     domain: cogs
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_CEO
 
   - slot: ATOMOS_FINANCE_TEAM
+    uuid: bc0e684a-a508-4c9c-b777-590ee8b96863
     role: 매장 회계·손익계산서 발송 (cost 도메인)
     adapter: hermes_local
     model: deepseek/deepseek-v4-flash
@@ -137,18 +143,19 @@ agents:
     domain: cost
     send_gate: needs_external        # 손익서 발송은 외부 Pack 승격 전 draft-only
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_CEO
 
   # ── 미생성: 비전/외부 게이트 (글렌 "현재 개발 전") ──
   - slot: ATOMOS_VISION_AI_TEAM      # 구 ATOMOS_VISION 승계
+    uuid: 149aad7b-5f1f-4227-86eb-d7740181ece9
     role: 카메라/비전·D-CONTRACT OCR·검침 (contract_extractor, vision_meter_read)
     adapter: hermes_local
     model: google/gemini-3-flash
     model_fallback: glm-ocr
     toolsets: [terminal]
     budget_monthly_cents: 0          # advisory
-    status: not-created
+    status: paused                   # 골격 provision(스텁) — 활성화는 status active+budget
     reports_to: ATOMOS_CEO
 
 promotion_gate:                      # 슬롯 활성화 4조건 (조직 헌장 §3-3)
