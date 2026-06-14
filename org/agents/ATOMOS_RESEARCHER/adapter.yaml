@@ -8,7 +8,7 @@ adapterConfig:
   model: deepseek/deepseek-v4-flash      # v1 저가 운영. 타깃: gemini-3-flash (hermes 실측 후 후속)
   toolsets: terminal
   persistSession: true
-  timeoutSec: 300
+  timeoutSec: 600                        # 외부요인 조사 — ANALYST와 동일 ceiling (디스패처 poll budget 상한)
   hermesCommand: /paperclip/.local/bin/hermes
 budgetMonthlyCents: 1000
 status: paused                            # 승격(다중슬롯) — 디스패처 idle↔paused 토글
