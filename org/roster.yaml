@@ -10,13 +10,13 @@ agents:
   # ── 기존 6슬롯 (provisioned) ──
   - slot: ATOMOS_CEO
     uuid: 5e2ad936-b073-4ea5-9bba-d6852db88cb3
-    role: 오케스트레이터·영업 첫 관문 (조율만, 실행 금지 — risk/confidence 태깅 + 2+도메인 분해)
+    role: 오케스트레이터·영업 첫 관문 (조율만, 실행 금지 — E층 디스패치 게이트 GO/NO_GO/HOLD 판단)
     adapter: hermes_local
-    model: moonshotai/kimi-k2.6
-    model_fallback: deepseek/deepseek-v4-flash
+    model: deepseek/deepseek-v4-flash       # 게이트 v1, bake-off 5R 선정 (kimi는 JSON 트렁케이트)
+    model_target: qwen/qwen3.6-flash        # 후속 다도메인 분해 시
     toolsets: [terminal]
-    budget_monthly_cents: 0          # advisory; 승격 시 책정
-    status: paused                   # 2+도메인 동시 분해 필요 시 승격 (최후)
+    budget_monthly_cents: 500        # advisory ($5)
+    status: active                   # 게이트 활성화
     reports_to: null
 
   - slot: ATOMOS_CTO
