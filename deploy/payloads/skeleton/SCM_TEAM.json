@@ -1,0 +1,24 @@
+{
+  "name": "ATOMOS_SCM_TEAM",
+  "role": "general",
+  "title": "공급망 팀",
+  "icon": "package",
+  "status": "paused",
+  "reportsTo": "5e2ad936-b073-4ea5-9bba-d6852db88cb3",
+  "capabilities": "Owns ingredient sourcing, price tracking, and supplier management for ATOMOS COGS domain.",
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "model": "deepseek/deepseek-v4-flash",
+    "provider": "openrouter",
+    "toolsets": "terminal",
+    "timeoutSec": 600,
+    "hermesCommand": "/paperclip/.local/bin/hermes",
+    "persistSession": true,
+    "instructionsEntryFile": "AGENTS.md",
+    "instructionsBundleMode": "managed"
+  },
+  "runtimeConfig": {"heartbeat": {"enabled": false, "wakeOnDemand": true, "maxConcurrentRuns": 20}},
+  "budgetMonthlyCents": 0,
+  "permissions": {"canCreateAgents": false},
+  "metadata": {"atomosRole": "scm"}
+}
