@@ -57,12 +57,12 @@ agents:
     uuid: 7329c63d-27e4-4e54-a592-edf8e3418a3b
     role: 상권·시장·프랜차이즈·민관·소상공인 웹 리서치
     adapter: hermes_local
-    adapter_current: codex_local
-    model: google/gemini-3-flash
-    model_fallback: google/gemini-3.1-flash-lite
+    model: deepseek/deepseek-v4-flash       # v1 현행. 타깃 gemini-3-flash (hermes 실측 후 후속)
+    model_target: google/gemini-3-flash
     toolsets: [terminal]
-    budget_monthly_cents: 0          # advisory
-    status: paused
+    domain: sales
+    budget_monthly_cents: 1000       # advisory ($10)
+    status: active  # 승격(다중슬롯 fan-out)
     reports_to: ATOMOS_CEO
 
   - slot: ATOMOS_HERMES

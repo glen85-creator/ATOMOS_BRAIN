@@ -1,15 +1,15 @@
 # ATOMOS_RESEARCHER — Paperclip PATCH 페이로드 원본
-# ⚠️ 현행 adapterType=codex_local → hermes_local 전환 대상 (M2, 미결 #3 승인됨)
+# 승격(다중슬롯 fan-out) — 디스패처 idle↔paused 토글
 slot: ATOMOS_RESEARCHER
 uuid: 7329c63d-27e4-4e54-a592-edf8e3418a3b
 adapterType: hermes_local
 adapterConfig:
   provider: openrouter
-  model: google/gemini-3-flash           # 활성화 전 hermes chat 1회 실측 필수. 대안 google/gemini-3.1-flash-lite
+  model: deepseek/deepseek-v4-flash      # v1 저가 운영. 타깃: gemini-3-flash (hermes 실측 후 후속)
   toolsets: terminal
   persistSession: true
-  timeoutSec: 300
+  timeoutSec: 600                        # 외부요인 조사 — ANALYST와 동일 ceiling (디스패처 poll budget 상한)
   hermesCommand: /paperclip/.local/bin/hermes
-budgetMonthlyCents: 0
-status: paused
+budgetMonthlyCents: 1000
+status: paused                            # 승격(다중슬롯) — 디스패처 idle↔paused 토글
 reportsTo: 5e2ad936-b073-4ea5-9bba-d6852db88cb3   # ATOMOS_CEO
