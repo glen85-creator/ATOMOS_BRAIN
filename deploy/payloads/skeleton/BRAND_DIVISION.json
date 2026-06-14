@@ -1,0 +1,24 @@
+{
+  "name": "ATOMOS_BRAND_DIVISION",
+  "role": "general",
+  "title": "브랜드 본부",
+  "icon": "layers",
+  "status": "paused",
+  "reportsTo": "5e2ad936-b073-4ea5-9bba-d6852db88cb3",
+  "capabilities": "Umbrella division coordinating MARKETING and CONTENTS sub-slots under CEO direction.",
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "model": "deepseek/deepseek-v4-flash",
+    "provider": "openrouter",
+    "toolsets": "terminal",
+    "timeoutSec": 600,
+    "hermesCommand": "/paperclip/.local/bin/hermes",
+    "persistSession": true,
+    "instructionsEntryFile": "AGENTS.md",
+    "instructionsBundleMode": "managed"
+  },
+  "runtimeConfig": {"heartbeat": {"enabled": false, "wakeOnDemand": true, "maxConcurrentRuns": 20}},
+  "budgetMonthlyCents": 0,
+  "permissions": {"canCreateAgents": false},
+  "metadata": {"atomosRole": "brand_division"}
+}

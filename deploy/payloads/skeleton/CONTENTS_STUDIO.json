@@ -1,0 +1,24 @@
+{
+  "name": "ATOMOS_CONTENTS_STUDIO",
+  "role": "general",
+  "title": "콘텐츠 스튜디오",
+  "icon": "image",
+  "status": "paused",
+  "reportsTo": "__BRAND_DIVISION_UUID__",
+  "capabilities": "Generates promotional content drafts (image/video prompts, copy); physical orders gated behind external Pack.",
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "model": "deepseek/deepseek-v4-flash",
+    "provider": "openrouter",
+    "toolsets": "terminal",
+    "timeoutSec": 600,
+    "hermesCommand": "/paperclip/.local/bin/hermes",
+    "persistSession": true,
+    "instructionsEntryFile": "AGENTS.md",
+    "instructionsBundleMode": "managed"
+  },
+  "runtimeConfig": {"heartbeat": {"enabled": false, "wakeOnDemand": true, "maxConcurrentRuns": 20}},
+  "budgetMonthlyCents": 0,
+  "permissions": {"canCreateAgents": false},
+  "metadata": {"atomosRole": "contents"}
+}
