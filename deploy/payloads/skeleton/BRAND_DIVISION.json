@@ -2,7 +2,7 @@
   "name": "ATOMOS_BRAND_DIVISION",
   "role": "general",
   "title": "브랜드 본부",
-  "icon": "layers",
+  "icon": "star",
   "status": "paused",
   "reportsTo": "5e2ad936-b073-4ea5-9bba-d6852db88cb3",
   "capabilities": "Umbrella division coordinating MARKETING and CONTENTS sub-slots under CEO direction.",

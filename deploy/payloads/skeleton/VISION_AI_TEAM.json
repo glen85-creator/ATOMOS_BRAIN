@@ -2,7 +2,7 @@
   "name": "ATOMOS_VISION_AI_TEAM",
   "role": "general",
   "title": "비전 AI 팀",
-  "icon": "camera",
+  "icon": "eye",
   "status": "paused",
   "reportsTo": "5e2ad936-b073-4ea5-9bba-d6852db88cb3",
   "capabilities": "Camera/vision OCR for D-CONTRACT extraction and meter reading.",

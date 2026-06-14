@@ -2,7 +2,7 @@
   "name": "ATOMOS_CONTENTS_STUDIO",
   "role": "general",
   "title": "콘텐츠 스튜디오",
-  "icon": "image",
+  "icon": "sparkles",
   "status": "paused",
   "reportsTo": "__BRAND_DIVISION_UUID__",
   "capabilities": "Generates promotional content drafts (image/video prompts, copy); physical orders gated behind external Pack.",

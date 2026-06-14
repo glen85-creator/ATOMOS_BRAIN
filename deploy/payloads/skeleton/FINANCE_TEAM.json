@@ -2,7 +2,7 @@
   "name": "ATOMOS_FINANCE_TEAM",
   "role": "general",
   "title": "재무 팀",
-  "icon": "calculator",
+  "icon": "gem",
   "status": "paused",
   "reportsTo": "5e2ad936-b073-4ea5-9bba-d6852db88cb3",
   "capabilities": "Owns store accounting and P&L statement drafting for the COST domain.",
