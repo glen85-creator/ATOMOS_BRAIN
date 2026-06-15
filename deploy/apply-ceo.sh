@@ -21,6 +21,6 @@ echo "   응답: $(echo "$RESP" | head -c 500)"
 
 echo "== 3) 검증 =="
 docker exec -u node "$PC" bash -lc "curl -s -b /tmp/pc.cookies http://localhost:3100/api/companies/$COMPANY_ID/agents" \
-  | python3 -c "import json,sys; ags=json.load(sys.stdin); ags=ags if isinstance(ags,list) else ags.get('agents',[]); a=[x for x in ags if x.get('id')=='$ATOMOS_CEO'][0]; ac=a.get('adapterConfig',{}); print('   adapter=%s model=%s budget=%s promptTemplate=%s' % (a.get('adapterType'), ac.get('model'), a.get('budgetMonthlyCents'), bool(ac.get('promptTemplate'))))"
+  | python3 -c "import json,sys; ags=json.load(sys.stdin); ags=ags if isinstance(ags,list) else ags.get('agents',[]); a=[x for x in ags if x.get('id')=='$ATOMOS_CEO'][0]; ac=a.get('adapterConfig',{}); print('   adapter=%s model=%s budget=%s promptTemplate=%s persistSession=%s' % (a.get('adapterType'), ac.get('model'), a.get('budgetMonthlyCents'), bool(ac.get('promptTemplate')), ac.get('persistSession')))"
 
-echo "== done. 기대: adapter=hermes_local model=deepseek/deepseek-v4-flash budget=500 promptTemplate=True =="
+echo "== done. 기대: adapter=hermes_local model=deepseek/deepseek-v4-flash budget=500 promptTemplate=True persistSession=False =="
