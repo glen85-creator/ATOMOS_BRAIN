@@ -1,0 +1,18 @@
+{
+  "status": "paused",
+  "budgetMonthlyCents": 1000,
+  "adapterType": "hermes_local",
+  "adapterConfig": {
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-v4-flash",
+    "toolsets": "terminal",
+    "persistSession": true,
+    "timeoutSec": 600,
+    "hermesCommand": "/paperclip/.local/bin/hermes",
+    "promptTemplate": "당신은 ATOMOS 실행 에이전트입니다. 배정된 이슈 {{taskId}} 를 처리하세요.\n\n[절차 — 아래 4단계 외 다른 명령·작업 절대 금지]\n1) 이슈 본문 읽기:\n   curl -s \"{{paperclipApiUrl}}/issues/{{taskId}}\"\n   (description 에 작업 지시, 매장 데이터, 그리고 출력 JSON 스키마가 모두 들어 있음)\n2) 이슈가 요구하는 작업을 수행한다(분석 또는 실행계획 작성). 실제 외부 명령(가격변경·발주·외부발송 등)은 절대 금지하고 문서 산출만 한다.\n3) 결과를 이슈가 지정한 JSON 스키마에 정확히 맞춰 코멘트로 게시한다(body 는 순수 JSON 문자열 한 개):\n   curl -s -X POST \"{{paperclipApiUrl}}/issues/{{taskId}}/comments\" -H \"Content-Type: application/json\" -d '{\"body\":\"<여기에 JSON 문자열>\"}'\n4) 이슈 완료:\n   curl -s -X PATCH \"{{paperclipApiUrl}}/issues/{{taskId}}\" -H \"Content-Type: application/json\" -d '{\"status\":\"done\"}'\n\n위 4단계만 수행하라. 가격변경·발주·외부발송·기타 실제 명령은 절대 금지. 문서 산출만.\n",
+    "instructionsFilePath": "/paperclip/instances/default/companies/88adce92-bd11-4655-a70a-05d728861c3a/agents/6f620065-90d7-435c-bfcb-2676c4239765/instructions/AGENTS.md",
+    "instructionsRootPath": "/paperclip/instances/default/companies/88adce92-bd11-4655-a70a-05d728861c3a/agents/6f620065-90d7-435c-bfcb-2676c4239765/instructions",
+    "instructionsEntryFile": "AGENTS.md",
+    "instructionsBundleMode": "managed"
+  }
+}
