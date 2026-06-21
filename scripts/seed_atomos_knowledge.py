@@ -7,6 +7,7 @@ frontmatter: scope, read_tier, read_roles, tags, title (python-frontmatter).
 import glob
 import os
 import sys
+import urllib.parse
 
 import frontmatter
 import requests
@@ -41,17 +42,25 @@ def main() -> int:
     rows = [parse_row(f) for f in files]
     keep = {r["source_path"] for r in rows}
 
-    existing = requests.get(f"{url}/rest/v1/atomos_knowledge?select=source_path",
-                            headers=h, timeout=30).json()
+    # reconcile GET은 atomos_knowledge가 PostgREST 기본 행 상한 미만이라고 가정(현 규모 OK; 커지면 페이지네이션).
+    resp = requests.get(f"{url}/rest/v1/atomos_knowledge?select=source_path",
+                        headers=h, timeout=30)
+    resp.raise_for_status()
+    existing = resp.json()
+    if not isinstance(existing, list):
+        raise RuntimeError(f"unexpected reconcile response: {existing!r}")
     for row in existing:
         sp = row.get("source_path")
         if sp and sp not in keep:
-            requests.delete(f"{url}/rest/v1/atomos_knowledge?source_path=eq.{sp}", headers=h, timeout=30)
+            requests.delete(
+                f"{url}/rest/v1/atomos_knowledge?source_path=eq.{urllib.parse.quote(sp, safe='')}",
+                headers=h, timeout=30)
             print("deleted", sp)
 
     for row in rows:
-        requests.delete(f"{url}/rest/v1/atomos_knowledge?source_path=eq.{row['source_path']}",
-                        headers=h, timeout=30)
+        requests.delete(
+            f"{url}/rest/v1/atomos_knowledge?source_path=eq.{urllib.parse.quote(row['source_path'], safe='')}",
+            headers=h, timeout=30)
         r = requests.post(f"{url}/rest/v1/atomos_knowledge",
                           headers={**h, "Prefer": "return=minimal"}, json=row, timeout=30)
         print(row["source_path"], "->", r.status_code)

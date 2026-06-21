@@ -44,9 +44,13 @@ def lint_doc(doc: dict) -> list:
         out.append(Finding("WARN", "read_tier 누락 → ATOMOS_MASTER 기본(사람 노출 0). 의도 확인."))
     elif tier not in VALID_TIERS:
         out.append(Finding("ERROR", f"read_tier enum 밖: {tier!r}"))
-    for r in (doc.get("read_roles") or []):
-        if r not in ROLE_REGISTRY:
-            out.append(Finding("WARN", f"미등록 read_role: {r!r} (레지스트리={sorted(ROLE_REGISTRY)})"))
+    read_roles = doc.get("read_roles")
+    if isinstance(read_roles, str):
+        out.append(Finding("ERROR", "read_roles는 리스트여야 함 (예: [ANALYST])"))
+    else:
+        for r in (read_roles or []):
+            if r not in ROLE_REGISTRY:
+                out.append(Finding("WARN", f"미등록 read_role: {r!r} (레지스트리={sorted(ROLE_REGISTRY)})"))
     return out
 
 
@@ -55,8 +59,14 @@ def main(argv: list) -> int:
     files = glob.glob(os.path.join(root, "**", "*.md"), recursive=True)
     errors = 0
     for f in files:
-        for finding in lint_doc(parse_doc(f)):
-            rel = os.path.relpath(f, root).replace(os.sep, "/")
+        rel = os.path.relpath(f, root).replace(os.sep, "/")
+        try:
+            doc = parse_doc(f)
+        except Exception as e:
+            print(f"ERROR: {rel}: frontmatter 파싱 실패: {e}")
+            errors += 1
+            continue
+        for finding in lint_doc(doc):
             print(f"{finding.level}: {rel}: {finding.message}")
             if finding.level == "ERROR":
                 errors += 1

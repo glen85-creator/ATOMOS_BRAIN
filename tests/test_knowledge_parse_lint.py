@@ -1,5 +1,4 @@
-import frontmatter
-from scripts.lint_knowledge import lint_doc, VALID_TIERS, ROLE_REGISTRY, SCOPE_RE
+from scripts.lint_knowledge import lint_doc
 
 def _doc(meta: dict, body: str = "본문") -> dict:
     parsed = {
@@ -42,6 +41,21 @@ def test_unknown_role_is_warn():
     findings = lint_doc(_doc({"scope": "global", "read_tier": "HQ_STAFF",
                               "read_roles": ["WIZARD"], "title": "T"}))
     assert any(f.level == "WARN" and "WIZARD" in f.message for f in findings)
+
+def test_scalar_read_roles_is_single_error():
+    findings = lint_doc({"scope": "global", "read_tier": "HQ_STAFF",
+                         "read_roles": "ANALYST", "title": "T"})
+    errs = [f for f in findings if f.level == "ERROR"]
+    assert len(errs) == 1 and "read_roles" in errs[0].message
+
+def test_malformed_frontmatter_file_is_error(tmp_path, capsys):
+    import scripts.lint_knowledge as lk
+    bad = tmp_path / "bad.md"
+    bad.write_text("---\nscope: [unclosed\n---\nbody", encoding="utf-8")
+    rc = lk.main(["lint_knowledge.py", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert "파싱 실패" in out
 
 
 from scripts.seed_atomos_knowledge import parse_row
