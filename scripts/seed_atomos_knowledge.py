@@ -12,6 +12,11 @@ import urllib.parse
 import frontmatter
 import requests
 
+try:  # 패키지(import scripts.seed_atomos_knowledge)·직접실행(python scripts/seed_atomos_knowledge.py) 양립
+    from scripts.links import build_link_rows
+except ImportError:  # 직접실행 시 scripts/가 sys.path[0]라 패키지 경로 미해소
+    from links import build_link_rows
+
 ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "knowledge")
 
 
@@ -67,6 +72,31 @@ def main() -> int:
         if r.status_code >= 300:
             print("  body:", r.text)
     print(f"seeded {len(rows)} docs")
+
+    # ── 링크테이블 재구축(atomos_knowledge_links) ──
+    link_rows = build_link_rows(rows)
+    for r in rows:
+        fp = urllib.parse.quote(r["source_path"], safe="")
+        requests.delete(f"{url}/rest/v1/atomos_knowledge_links?from_path=eq.{fp}",
+                        headers=h, timeout=30)
+    lresp = requests.get(f"{url}/rest/v1/atomos_knowledge_links?select=from_path",
+                         headers=h, timeout=30)
+    lresp.raise_for_status()
+    existing_links = lresp.json()
+    if not isinstance(existing_links, list):
+        raise RuntimeError(f"unexpected links response: {existing_links!r}")
+    for row in existing_links:
+        fp = row.get("from_path")
+        if fp and fp not in keep:
+            requests.delete(
+                f"{url}/rest/v1/atomos_knowledge_links?from_path=eq.{urllib.parse.quote(fp, safe='')}",
+                headers=h, timeout=30)
+    for lr in link_rows:
+        rr = requests.post(f"{url}/rest/v1/atomos_knowledge_links",
+                           headers={**h, "Prefer": "return=minimal"}, json=lr, timeout=30)
+        if rr.status_code >= 300:
+            print("  link insert:", lr["from_path"], "->", rr.status_code, rr.text)
+    print(f"linked {len(link_rows)} edges")
     return 0
 
 
