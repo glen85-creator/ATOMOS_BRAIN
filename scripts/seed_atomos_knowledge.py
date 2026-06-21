@@ -1,52 +1,65 @@
-"""ATOMOS_BRAIN/knowledge/**.md → Supabase atomos_knowledge 적재(멱등: source_path 기준 upsert).
-
-frontmatter(scope, read_roles, title) 파싱. 엔진 venv/Supabase 자격으로 실행.
-사용: SUPABASE_URL/SUPABASE_SERVICE_KEY env 설정 후
-  python scripts/seed_atomos_knowledge.py
-선행: FastAPI/migrations/007_atomos_phase1_mcp.sql 적용(atomos_knowledge 테이블 존재).
+"""ATOMOS_BRAIN/knowledge/**.md → Supabase atomos_knowledge 적재.
+멱등(source_path upsert) + 삭제 reconcile(리포에 없는 source_path 제거).
+frontmatter: scope, read_tier, read_roles, tags, title (python-frontmatter).
+사용: SUPABASE_URL/SUPABASE_SERVICE_KEY env 설정 후  python scripts/seed_atomos_knowledge.py
+선행: FastAPI/migrations/007 + 008 적용.
 """
 import glob
 import os
-import re
+import sys
 
+import frontmatter
 import requests
 
-URL = os.environ["SUPABASE_URL"].rstrip("/")
-KEY = os.environ["SUPABASE_SERVICE_KEY"]
-H = {"apikey": KEY, "Authorization": f"Bearer {KEY}", "Content-Type": "application/json"}
 ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "knowledge")
 
 
-def parse(path: str) -> dict:
-    raw = open(path, encoding="utf-8").read()
-    m = re.match(r"^---\n(.*?)\n---\n(.*)$", raw, re.DOTALL)
-    meta_block, body = (m.group(1), m.group(2)) if m else ("", raw)
-    meta = {}
-    for line in meta_block.splitlines():
-        if ":" in line:
-            k, _, v = line.partition(":")
-            meta[k.strip()] = v.strip()
-    scope = meta.get("scope") or "global"
-    roles_raw = meta.get("read_roles", "[ANALYST]").strip("[]")
-    roles = [r.strip() for r in roles_raw.split(",") if r.strip()] or ["ANALYST"]
-    title = meta.get("title") or os.path.basename(path)
-    rel = os.path.relpath(path, ROOT).replace("\\", "/")
-    return {"scope": scope, "read_roles": roles, "title": title,
-            "body": body.strip(), "source_path": rel}
+def parse_row(path: str, root: str = ROOT) -> dict:
+    post = frontmatter.load(path)
+    m = post.metadata
+    rel = os.path.relpath(path, root).replace(os.sep, "/")
+    return {
+        "scope": m.get("scope") or "global",
+        "read_tier": m.get("read_tier") or "ATOMOS_MASTER",
+        "read_roles": list(m.get("read_roles") or []),
+        "tags": list(m.get("tags") or []),
+        "title": m.get("title") or os.path.basename(path),
+        "body": post.content.strip(),
+        "source_path": rel,
+    }
 
 
-def main():
+def _headers(key: str) -> dict:
+    return {"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+
+
+def main() -> int:
+    url = os.environ["SUPABASE_URL"].rstrip("/")
+    key = os.environ["SUPABASE_SERVICE_KEY"]
+    h = _headers(key)
     files = glob.glob(os.path.join(ROOT, "**", "*.md"), recursive=True)
-    rows = [parse(f) for f in files]
+    rows = [parse_row(f) for f in files]
+    keep = {r["source_path"] for r in rows}
+
+    existing = requests.get(f"{url}/rest/v1/atomos_knowledge?select=source_path",
+                            headers=h, timeout=30).json()
+    for row in existing:
+        sp = row.get("source_path")
+        if sp and sp not in keep:
+            requests.delete(f"{url}/rest/v1/atomos_knowledge?source_path=eq.{sp}", headers=h, timeout=30)
+            print("deleted", sp)
+
     for row in rows:
-        # 멱등: 같은 source_path 삭제 후 삽입
-        requests.delete(f"{URL}/rest/v1/atomos_knowledge?source_path=eq.{row['source_path']}",
-                        headers=H, timeout=30)
-        r = requests.post(f"{URL}/rest/v1/atomos_knowledge",
-                          headers={**H, "Prefer": "return=minimal"}, json=row, timeout=30)
+        requests.delete(f"{url}/rest/v1/atomos_knowledge?source_path=eq.{row['source_path']}",
+                        headers=h, timeout=30)
+        r = requests.post(f"{url}/rest/v1/atomos_knowledge",
+                          headers={**h, "Prefer": "return=minimal"}, json=row, timeout=30)
         print(row["source_path"], "->", r.status_code)
+        if r.status_code >= 300:
+            print("  body:", r.text)
     print(f"seeded {len(rows)} docs")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

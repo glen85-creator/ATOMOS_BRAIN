@@ -42,3 +42,28 @@ def test_unknown_role_is_warn():
     findings = lint_doc(_doc({"scope": "global", "read_tier": "HQ_STAFF",
                               "read_roles": ["WIZARD"], "title": "T"}))
     assert any(f.level == "WARN" and "WIZARD" in f.message for f in findings)
+
+
+from scripts.seed_atomos_knowledge import parse_row
+
+def test_parse_row_reads_tier_and_tags(tmp_path):
+    p = tmp_path / "n.md"
+    p.write_text("---\nscope: store:ST-1\nread_tier: HQ_STAFF\n"
+                 "read_roles: [ANALYST]\ntags: [매출, 급락]\ntitle: T\n---\n본문입니다",
+                 encoding="utf-8")
+    row = parse_row(str(p), str(tmp_path))
+    assert row["scope"] == "store:ST-1"
+    assert row["read_tier"] == "HQ_STAFF"
+    assert row["read_roles"] == ["ANALYST"]
+    assert row["tags"] == ["매출", "급락"]
+    assert row["title"] == "T"
+    assert row["body"] == "본문입니다"
+    assert row["source_path"] == "n.md"
+
+def test_parse_row_defaults_tier_to_master(tmp_path):
+    p = tmp_path / "n.md"
+    p.write_text("---\nscope: global\ntitle: T\n---\n본문", encoding="utf-8")
+    row = parse_row(str(p), str(tmp_path))
+    assert row["read_tier"] == "ATOMOS_MASTER"
+    assert row["read_roles"] == []
+    assert row["tags"] == []
