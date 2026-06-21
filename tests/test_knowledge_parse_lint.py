@@ -81,3 +81,36 @@ def test_parse_row_defaults_tier_to_master(tmp_path):
     assert row["read_tier"] == "ATOMOS_MASTER"
     assert row["read_roles"] == []
     assert row["tags"] == []
+
+
+from scripts.links import extract_links, resolve_target, build_link_rows
+
+def test_extract_links_simple():
+    assert extract_links("see [[dept/sales/x]] now") == [("dept/sales/x", "dept/sales/x")]
+
+def test_extract_links_label_and_multiple():
+    assert extract_links("[[a|라벨]] and [[b]]") == [("a", "라벨"), ("b", "b")]
+
+def test_extract_links_none():
+    assert extract_links("no links") == []
+
+def test_resolve_target_direct_and_md_fallback():
+    known = {"global/g.md", "dept/sales/x.md"}
+    assert resolve_target("global/g.md", known) == "global/g.md"
+    assert resolve_target("dept/sales/x", known) == "dept/sales/x.md"
+    assert resolve_target("ghost", known) is None
+
+def test_build_link_rows_resolves_and_marks_unresolved():
+    rows = [
+        {"source_path": "a.md", "body": "[[b]] and [[ghost]]"},
+        {"source_path": "b.md", "body": "no links"},
+    ]
+    out = build_link_rows(rows)
+    assert {"from_path": "a.md", "to_ref": "b", "to_path": "b.md", "resolved": True} in out
+    assert {"from_path": "a.md", "to_ref": "ghost", "to_path": None, "resolved": False} in out
+    assert len(out) == 2
+
+def test_build_link_rows_dedups_same_ref():
+    rows = [{"source_path": "a.md", "body": "[[b]] [[b]]"}, {"source_path": "b.md", "body": ""}]
+    out = build_link_rows(rows)
+    assert len([r for r in out if r["from_path"] == "a.md" and r["to_ref"] == "b"]) == 1
