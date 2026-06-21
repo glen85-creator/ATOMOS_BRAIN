@@ -91,6 +91,29 @@ A모델: **읽기/조회 전용**(쓰기·실행 없음 — 실행은 엔진).
 - **지식 2종**: 참조지식(사람 큐레이션) — **v1 채택**. 학습지식(검증된 사이클 자동축적) — **v2로 연기**.
 - **품질 가드**: 학습은 검증된 사이클만 / 사람 "틀림" 피드백 / 출처·신뢰도 메타.
 
+## 5a. 지식 레이어 확장 — 권한 4계층 · 사람 열람 표면 · 유지 루프 (2026-06-21, Quartz/llm-wiki 검토 반영)
+검토(소스검증): Quartz(정적 SSG)·Karpathy llm-wiki(패턴)·LLM-Wiki 앱(GPL-3.0) **모두 접근권한 없음** → 권한은 우리 레이어 전담. 셋은 같은 markdown 위 3레이어로 보완(유지=llm-wiki / 서빙·권한=MCP+pgvector / 사람열람=콘솔페이지 또는 Quartz). ADR: glen_work `2026-06-21-atomos-brain-knowledge-layer`.
+
+### 권한 모델 = (role × scope), frontmatter 단일원천
+- frontmatter `scope` + `read_roles[]`. 요청자(사람 세션·에이전트)가 (role, scope) 보유 → 게이트 필터.
+- 사람 4계층(단조 포함): **STORE_OWNER**(자기 store + brand점주공개 + global점주안전) ⊂ **HQ_STAFF**(dept+brand+global) ⊂ **HQ_EXEC**(전 brand/dept/store 읽기) ⊂ **ATOMOS_MASTER**(전부 + system/meta/학습지식 + 쓰기·큐레이션·lint).
+- 에이전트 역할(ANALYST 등)도 동일 게이트(§4b 세션토큰 role/scope). `read_roles` {ANALYST}→4계층+에이전트로 확장.
+- **강제 지점 = BRAIN/MCP 런타임. UI 아님 — "숨김=데이터가 안 옴"(클라 필터 금지).** = fail-closed/anon-REVOKE 일관(§90 "권한 2층"을 이 모델로 구체화).
+
+### 사람 열람 표면 — (A) 콘솔 내 페이지 권장 / (B) Quartz 옵션
+- **(A 권장) 콘솔(hbs-dashboard) 내 "BRAIN 참조" 페이지(동적).** MCP/pgvector가 (role,scope)로 서빙 → 검색(의미+키워드)·노트뷰(인용·백링크)·스코프탐색·그래프를 React 네이티브 구현. 단일 사이트·단일 로그인·민감지식 정적유출 0. (콘솔=행동 DO, BRAIN참조=참조 KNOW — 별도 표면이나 같은 BRAIN.)
+- **(B 옵션) Quartz 별도 정적 사이트** — 비민감/사내공통 한정. 계층별 N빌드(커스텀 Filter가 read_roles/scope 읽음) + SSO 게이트. 민감 자산 빌드 제외 필수(비-md 자산 무조건 공개 함정). 그래프/검색 UX 공짜지만 정적·별도인증 비용. ⚠️ Quartz 필터를 접근통제로 신뢰 금지.
+
+### 유지 루프 = llm-wiki 패턴 (학습지식 v2 구현 방법)
+- ingest(소스→entity/concept 정규화·모순 플래그) / query(인용 답변→새 페이지 filed-back으로 compound) / lint(모순·stale·orphan·누락링크 점검). compile-not-retrieve.
+- **패턴만 차용 — GPL-3.0 LLM-Wiki 앱·LanceDB 미사용**, 우리 스택(pgvector+MCP)으로 구현. 사람=큐레이션/방향, ATOMOS=bookkeeping. index.md+log.md append-only 감사. 동시쓰기 락(병렬세션)·compound 모순 위험(→lint+사람검증) 유의. ~10만 토큰 이하 우위라 pgvector 병행.
+
+### 차용/비차용 요약
+- **Quartz** = 기능 아이디어(그래프·백링크·즉시검색) → A는 네이티브 재구현, 실사용은 B에서. 권한 X.
+- **llm-wiki** = 유지 패턴(v2). 권한 X.
+- **권한·스코프** = 100% 우리 레이어(§4b MCP + Supabase RLS).
+- 미결: 4계층 frontmatter 규약 확정 · BRAIN 참조 페이지 컴포넌트/API 계약 · 그래프·검색 구현 선택 · v2 ingest/lint 파이프라인.
+
 ## 6. 가로지르는 기반 (오늘 거친 seam 구조적 제거)
 - 단일 상태원천(DB 한 곳) → 멱등·중복 분열 제거.
 - 관측성: 모든 단계 동기·기록·실패 표면화, 실비용(추정 폐기).
