@@ -130,3 +130,10 @@ def test_lint_links_missing_and_orphan(capsys):
     assert "c.md: orphan" in out
     assert "a.md: orphan" not in out
     assert "b.md: orphan" not in out
+
+def test_lint_links_all_unresolved_is_orphan(capsys):
+    docs = [("a.md", {"source_path": "a.md", "body": "[[ghost]]"})]
+    _lint_links(docs)
+    out = capsys.readouterr().out
+    assert "미해소 링크 [[ghost]]" in out
+    assert "a.md: orphan" in out   # 모든 링크 미해소 → 0 resolved out/in → orphan

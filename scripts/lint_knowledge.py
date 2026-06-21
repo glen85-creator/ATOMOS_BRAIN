@@ -71,6 +71,7 @@ def _lint_links(docs: list) -> int:
             if tp is None:
                 print(f"WARN: {rel}: 미해소 링크 [[{to_ref}]]")
             else:
+                # outbound는 resolved 링크만 카운트 → 모든 링크가 미해소인 노트도 orphan(의도)
                 outbound[fp] = outbound.get(fp, 0) + 1
                 inbound[tp] = inbound.get(tp, 0) + 1
     for rel, d in docs:

@@ -75,22 +75,26 @@ def main() -> int:
 
     # ── 링크테이블 재구축(atomos_knowledge_links) ──
     link_rows = build_link_rows(rows)
-    for r in rows:
-        fp = urllib.parse.quote(r["source_path"], safe="")
-        requests.delete(f"{url}/rest/v1/atomos_knowledge_links?from_path=eq.{fp}",
-                        headers=h, timeout=30)
+    # 0) reconcile GET 먼저 — 실패 시 어떤 삭제도 하기 전에 중단(파괴 전 실패)
     lresp = requests.get(f"{url}/rest/v1/atomos_knowledge_links?select=from_path",
                          headers=h, timeout=30)
     lresp.raise_for_status()
     existing_links = lresp.json()
     if not isinstance(existing_links, list):
         raise RuntimeError(f"unexpected links response: {existing_links!r}")
+    # 1) 삭제된 노트의 링크 제거(stale)
     for row in existing_links:
         fp = row.get("from_path")
         if fp and fp not in keep:
             requests.delete(
                 f"{url}/rest/v1/atomos_knowledge_links?from_path=eq.{urllib.parse.quote(fp, safe='')}",
                 headers=h, timeout=30)
+    # 2) 현재 노트들의 기존 링크 삭제(per-from_path)
+    for r in rows:
+        fp = urllib.parse.quote(r["source_path"], safe="")
+        requests.delete(f"{url}/rest/v1/atomos_knowledge_links?from_path=eq.{fp}",
+                        headers=h, timeout=30)
+    # 3) 현재 링크 삽입
     for lr in link_rows:
         rr = requests.post(f"{url}/rest/v1/atomos_knowledge_links",
                            headers={**h, "Prefer": "return=minimal"}, json=lr, timeout=30)
