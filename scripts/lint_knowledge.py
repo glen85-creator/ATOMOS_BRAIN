@@ -9,6 +9,11 @@ from dataclasses import dataclass
 
 import frontmatter
 
+try:  # 패키지(import scripts.lint_knowledge / pytest)·직접실행(python scripts/lint_knowledge.py) 양립
+    from scripts.links import extract_links, resolve_target
+except ImportError:  # 직접실행 시 scripts/가 sys.path[0]라 패키지 경로 미해소
+    from links import extract_links, resolve_target
+
 VALID_TIERS = {"STORE_OWNER", "HQ_STAFF", "HQ_EXEC", "ATOMOS_MASTER"}
 ROLE_REGISTRY = {"ANALYST"}   # 도메인 활성화 시 1개씩 추가. legacy 로스터 비차용.
 SCOPE_RE = re.compile(r"^(global|brand:[^\s]+|dept:[^\s]+|store:[^\s]+)$")
@@ -54,10 +59,32 @@ def lint_doc(doc: dict) -> list:
     return out
 
 
+def _lint_links(docs: list) -> int:
+    """docs=[(rel, doc)] 크로스파일 검사 → missing-link/orphan WARN 출력. WARN만이라 0 반환."""
+    known = {d["source_path"] for _, d in docs}
+    inbound = {p: 0 for p in known}
+    outbound = {p: 0 for p in known}
+    for rel, d in docs:
+        fp = d["source_path"]
+        for to_ref, _label in extract_links(d.get("body") or ""):
+            tp = resolve_target(to_ref, known)
+            if tp is None:
+                print(f"WARN: {rel}: 미해소 링크 [[{to_ref}]]")
+            else:
+                outbound[fp] = outbound.get(fp, 0) + 1
+                inbound[tp] = inbound.get(tp, 0) + 1
+    for rel, d in docs:
+        fp = d["source_path"]
+        if inbound.get(fp, 0) == 0 and outbound.get(fp, 0) == 0:
+            print(f"WARN: {rel}: orphan (인·아웃 링크 0)")
+    return 0
+
+
 def main(argv: list) -> int:
     root = argv[1] if len(argv) > 1 else ROOT
     files = glob.glob(os.path.join(root, "**", "*.md"), recursive=True)
     errors = 0
+    docs = []
     for f in files:
         rel = os.path.relpath(f, root).replace(os.sep, "/")
         try:
@@ -66,10 +93,12 @@ def main(argv: list) -> int:
             print(f"ERROR: {rel}: frontmatter 파싱 실패: {e}")
             errors += 1
             continue
+        docs.append((rel, doc))
         for finding in lint_doc(doc):
             print(f"{finding.level}: {rel}: {finding.message}")
             if finding.level == "ERROR":
                 errors += 1
+    _lint_links(docs)
     print(f"lint: {len(files)} files, {errors} error(s)")
     return 1 if errors else 0
 

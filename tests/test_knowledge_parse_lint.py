@@ -114,3 +114,19 @@ def test_build_link_rows_dedups_same_ref():
     rows = [{"source_path": "a.md", "body": "[[b]] [[b]]"}, {"source_path": "b.md", "body": ""}]
     out = build_link_rows(rows)
     assert len([r for r in out if r["from_path"] == "a.md" and r["to_ref"] == "b"]) == 1
+
+
+from scripts.lint_knowledge import _lint_links
+
+def test_lint_links_missing_and_orphan(capsys):
+    docs = [
+        ("a.md", {"source_path": "a.md", "body": "[[b]] and [[ghost]]"}),
+        ("b.md", {"source_path": "b.md", "body": "no links"}),
+        ("c.md", {"source_path": "c.md", "body": "lonely"}),
+    ]
+    _lint_links(docs)
+    out = capsys.readouterr().out
+    assert "미해소 링크 [[ghost]]" in out
+    assert "c.md: orphan" in out
+    assert "a.md: orphan" not in out
+    assert "b.md: orphan" not in out
