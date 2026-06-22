@@ -1,5 +1,6 @@
 ---
 scope: global
+read_tier: ATOMOS_MASTER
 read_roles: [ANALYST]
 title: 분석 그라운딩 규칙
 ---
