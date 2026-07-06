@@ -43,6 +43,7 @@ vehicle 전면 직접호출 전환은 보류(에이전트=charter의 1차 실행
 
 - [[global/glen/decisions/2026-06-15-ceo-gate-v1-flag-off-harden]]
 - [[global/glen/decisions/2026-06-15-5output-synthesis-delivery]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

@@ -38,6 +38,7 @@ CEO 동적분해가 정상 운영(ON)에선 마케팅 채널을 계속 가지치
 
 - [[global/glen/decisions/2026-06-16-marketing-channel-split]]
 - [[global/glen/decisions/2026-06-15-ceo-gate-v1-flag-off-harden]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

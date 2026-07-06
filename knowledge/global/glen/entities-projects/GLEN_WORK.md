@@ -9,7 +9,7 @@ tags: [status/active, domain/knowledge-management, glen-wiki, type/project]
 
 ## 개요
 
-본 볼트 자체. LLM Wiki 패턴 기반 개인 세컨드 브레인. Obsidian + Claude Code + obsidian-git으로 구동. 설계 출처는 안드레이 카파시의 LLM Wiki 아이디어, 구체적 구현 패턴은 Jay Choi의 튜토리얼(2026-04-18-jay-choi-llm-wiki-self-replica)을 따른다.
+본 볼트 자체. [[global/glen/concepts/LLM-Wiki]] 패턴 기반 개인 세컨드 브레인. [[global/glen/entities-technologies/Obsidian]] + [[global/glen/entities-technologies/Claude-Code]] + [[global/glen/entities-technologies/obsidian-git]]으로 구동. 설계 출처는 [[global/glen/entities-people/안드레이-카파시]]의 LLM Wiki 아이디어, 구체적 구현 패턴은 [[global/glen/entities-people/Jay-Choi]]의 튜토리얼(2026-04-18-jay-choi-llm-wiki-self-replica)을 따른다.
 
 ## 아키텍처
 
@@ -22,11 +22,11 @@ tags: [status/active, domain/knowledge-management, glen-wiki, type/project]
 
 ## 기술 스택
 
-- Obsidian — 노트 앱
-- Claude Code — LLM 에이전트
+- [[global/glen/entities-technologies/Obsidian]] — 노트 앱
+- [[global/glen/entities-technologies/Claude-Code]] — LLM 에이전트
 - Dataview — 동적 쿼리 (Obsidian 플러그인)
 - Bases — 데이터베이스 뷰 (Obsidian 코어)
-- obsidian-git — Git 동기화
+- [[global/glen/entities-technologies/obsidian-git]] — Git 동기화
 - Excalidraw — 다이어그램 (Obsidian 플러그인)
 
 ## 핵심 인물

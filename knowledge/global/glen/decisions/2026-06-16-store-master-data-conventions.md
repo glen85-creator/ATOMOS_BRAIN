@@ -38,6 +38,11 @@ tags: [domain/backend, domain/data, project/hbs-fastapi, status/active, glen-wik
 - 스키마: hbs-master-v2-schema
 - 미해결: 라벨↔컬럼 불일치 누적분 정리 정책, 동명 중복(OF-0007/0008) 처리, ET 잔여 84.
 
+## 관련
+
+- [[global/glen/entities-projects/HBS-FastAPI]]
+- [[global/glen/entities-technologies/Supabase]]
+
 ## 출처(원본)
 
 - FastAPI:scripts/load_stores_from_excel.py

@@ -46,6 +46,7 @@ sales 멀티슬롯 execution seed: floor(ANALYST) completed + **RESEARCHER fan-o
 
 - [[global/glen/decisions/2026-06-17-finance-scm-slots]]
 - [[global/glen/decisions/2026-06-16-slot-reliability]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

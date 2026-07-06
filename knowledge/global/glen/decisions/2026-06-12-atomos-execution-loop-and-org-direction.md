@@ -36,6 +36,10 @@ tags: [domain/atomos, project/hbs-dashboard, status/active, glen-wiki, type/deci
 - **디스패처 수정**: create_issue(assignee·idle)의 Assignment run이 실측 성공 경로 → 중복 wake_agent(On-demand timeout) 제거(origin/main `00c6505`).
 - **미결(다음 레이어)**: 스텝 모델 재설계 — 스텝 = B층 canned key_actions가 아니라 "디스패치 슬롯/산출물 1개당 1스텝". 다중슬롯·CEO 분해와 한 묶음으로 다음 브레인스토밍에서 결정.
 
+## 관련
+
+- [[global/glen/entities-projects/HBS-Dashboard]]
+
 ## 출처(원본)
 
 - hbs-dashboard:docs/superpowers/specs/2026-06-11-execution-loop-audit-and-recovery.md

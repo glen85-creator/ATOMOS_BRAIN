@@ -9,7 +9,7 @@ tags: [domain/knowledge-management, domain/browser-extension, glen-wiki, type/te
 
 ## 개요
 
-Obsidian 공식 브라우저 확장. 웹 페이지를 클릭 한 번으로 마크다운으로 변환해 지정한 볼트 폴더에 저장.
+[[global/glen/entities-technologies/Obsidian]] 공식 브라우저 확장. 웹 페이지를 클릭 한 번으로 마크다운으로 변환해 지정한 볼트 폴더에 저장.
 
 ## 핵심 특성
 

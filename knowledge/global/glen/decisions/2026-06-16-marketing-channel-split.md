@@ -45,6 +45,7 @@ sales fan-out의 단일 MARKETING 슬롯은 SNS·POP·리뷰를 "제안(actions[
 
 - [[global/glen/decisions/2026-06-15-ceo-dynamic-decomposition]]
 - [[global/glen/decisions/2026-06-15-sales-marketing-slot]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

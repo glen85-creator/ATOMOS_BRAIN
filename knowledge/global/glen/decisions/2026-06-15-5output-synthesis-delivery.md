@@ -33,6 +33,7 @@ E층 종착점 라이브·ON. draft-only(외부발송 아님). 다음: CEO clean
 ## 관련
 
 - [[global/glen/decisions/2026-06-15-ceo-gate-v1-flag-off-harden]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

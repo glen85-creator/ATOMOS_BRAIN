@@ -52,6 +52,7 @@ E층 플로우 재설계 라이브·머지·E2E 입증. ATOMOS E층의 사용자
 
 - [[global/glen/decisions/2026-06-17-crm-sales-slot]]
 - [[global/glen/decisions/2026-06-17-elayer-send-email]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

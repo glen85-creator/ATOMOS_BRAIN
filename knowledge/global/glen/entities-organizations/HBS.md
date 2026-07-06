@@ -26,7 +26,7 @@ tags: [domain/food-franchise, status/active, glen-wiki, type/organization]
 
 ## 주요 인물
 
-- glen — 1인 개발자 (LLM 보조)
+- [[global/glen/entities-people/glen]] — 1인 개발자 (LLM 보조)
 
 ## 관련 프로젝트·제품
 

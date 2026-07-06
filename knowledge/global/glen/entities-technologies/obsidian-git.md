@@ -9,7 +9,7 @@ tags: [domain/version-control, domain/knowledge-management, glen-wiki, type/tech
 
 ## 개요
 
-Obsidian 커뮤니티 플러그인. 볼트를 Git 저장소로 다루며 주기적으로 자동 commit·push·pull을 수행. 모바일·데스크톱 어디서나 같은 볼트를 동기화하고 변경 이력을 추적할 수 있게 한다.
+[[global/glen/entities-technologies/Obsidian]] 커뮤니티 플러그인. 볼트를 Git 저장소로 다루며 주기적으로 자동 commit·push·pull을 수행. 모바일·데스크톱 어디서나 같은 볼트를 동기화하고 변경 이력을 추적할 수 있게 한다.
 
 ## 핵심 특성
 

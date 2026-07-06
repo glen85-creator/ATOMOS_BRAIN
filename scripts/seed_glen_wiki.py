@@ -149,6 +149,32 @@ def normalize_ref(ref: str) -> str:
     return r
 
 
+def alias_key(relkey: str) -> str:
+    """정규화 별칭 키: 경로 마지막 세그먼트(파일명 stem)를 lower() + 공백·언더스코어 → 하이픈.
+    예 'entities/projects/HBS Dashboard' · '.../hbs_dashboard' · '.../hbs-dashboard'
+       → 모두 'hbs-dashboard'. case·공백·하이픈·언더스코어 변형 흡수.
+    """
+    stem = relkey.split("/")[-1]
+    stem = re.sub(r"[\s_]+", "-", stem.strip())
+    stem = re.sub(r"-{2,}", "-", stem).strip("-")
+    return stem.lower()
+
+
+def resolve_ref(target: str, ref_to_source: dict, alias_to_source: dict):
+    """위키링크 타겟 → 새 source_path 또는 None.
+    ① 정확 일치(정규화된 원본경로 키) → ② 정규화 별칭 키 → ③ None(강등).
+    반환 (source_path_or_None, matched_by) where matched_by in {"exact","alias",None}.
+    """
+    key = normalize_ref(target)
+    sp = ref_to_source.get(key)
+    if sp:
+        return sp, "exact"
+    sp = alias_to_source.get(alias_key(key))
+    if sp:
+        return sp, "alias"
+    return None, None
+
+
 def gw_relkey_to_category_slug(relkey: str) -> tuple:
     """'entities/projects/HBS Dashboard' → ('entities/projects', 'HBS Dashboard').
     concepts/decisions는 2세그먼트. 매칭 안 되면 (None, None).
@@ -163,28 +189,28 @@ def gw_relkey_to_category_slug(relkey: str) -> tuple:
     return None, None
 
 
-def convert_body_links(body: str, ref_to_source: dict) -> tuple:
-    """본문 [[...]] 2패스 변환. ref_to_source: normalize_ref 결과 → new source_path.
-    반환 (new_body, unresolved_count).
+def convert_body_links(body: str, ref_to_source: dict, alias_to_source: dict) -> tuple:
+    """본문 [[...]] 2패스 변환. 해소 ① 정확 → ② 정규화 별칭 → ③ 텍스트 강등.
+    반환 (new_body, {"unresolved", "alias"}) — alias=별칭으로 복구된 링크 수.
     """
-    unresolved = 0
+    stats = {"unresolved": 0, "alias": 0}
 
     def repl(m):
-        nonlocal unresolved
         target, label = m.group(1).strip(), m.group(2)
-        key = normalize_ref(target)
-        new_sp = ref_to_source.get(key)
+        new_sp, matched = resolve_ref(target, ref_to_source, alias_to_source)
         if new_sp:
+            if matched == "alias":
+                stats["alias"] += 1
             if label:
                 return f"[[{new_sp}|{label.strip()}]]"
             return f"[[{new_sp}]]"
         # 미시드 → 대괄호 제거, 라벨(있으면) 또는 원 타겟의 마지막 세그먼트로 텍스트 강등
-        unresolved += 1
+        stats["unresolved"] += 1
         if label:
             return label.strip()
-        return key.split("/")[-1]
+        return normalize_ref(target).split("/")[-1]
 
-    return WIKILINK_RE.sub(repl, body or ""), unresolved
+    return WIKILINK_RE.sub(repl, body or ""), stats
 
 
 def as_text(value) -> str:
@@ -216,7 +242,7 @@ def yaml_scalar(s: str) -> str:
 
 
 def build_output(meta: dict, body: str, title: str,
-                 ref_to_source: dict) -> tuple:
+                 ref_to_source: dict, alias_to_source: dict) -> tuple:
     gw_type = meta.get("type")
     # tags: gw tags + glen-wiki + type/{gw_type}
     gw_tags = meta.get("tags")
@@ -234,22 +260,30 @@ def build_output(meta: dict, body: str, title: str,
             seen.add(t)
             dedup.append(t)
 
-    new_body, unresolved = convert_body_links(body, ref_to_source)
+    new_body, body_stats = convert_body_links(body, ref_to_source, alias_to_source)
+    stats = {"unresolved": body_stats["unresolved"], "alias": body_stats["alias"],
+             "related_dropped": 0, "related_alias": 0}
 
-    # related: 시드 대상만 위키링크로
+    # related: 시드 대상만 위키링크로 (정확 → 별칭 → 생략)
     related = meta.get("related") or []
     if isinstance(related, str):
         related = [related]
     related_links = []
     for r in related:
-        key = normalize_ref(str(r).lstrip("[").rstrip("]"))
+        target = str(r).strip()
         # r이 이미 [[...]] 문자열일 수 있으니 안쪽 추출
-        m = WIKILINK_RE.fullmatch(str(r).strip())
+        m = WIKILINK_RE.fullmatch(target)
         if m:
-            key = normalize_ref(m.group(1).strip())
-        new_sp = ref_to_source.get(key)
+            target = m.group(1).strip()
+        else:
+            target = target.lstrip("[").rstrip("]").strip()
+        new_sp, matched = resolve_ref(target, ref_to_source, alias_to_source)
         if new_sp:
+            if matched == "alias":
+                stats["related_alias"] += 1
             related_links.append(new_sp)
+        else:
+            stats["related_dropped"] += 1
     # 중복 제거
     related_links = list(dict.fromkeys(related_links))
 
@@ -284,7 +318,7 @@ def build_output(meta: dict, body: str, title: str,
         "---",
         "",
     ]
-    return "\n".join(fm) + body_out, unresolved
+    return "\n".join(fm) + body_out, stats
 
 
 # ── 메인 ──────────────────────────────────────────────────────────────
@@ -308,11 +342,24 @@ def main() -> int:
         print("ERROR: 입력 없음 — GW_WIKI 경로 확인:", GW_WIKI)
         return 1
 
-    # 1패스: 원본 relkey → 새 source_path 매핑
+    # 1패스: 원본 relkey → 새 source_path 정확 매핑 + 정규화 별칭 매핑
+    #  · ref_to_source(정확): normalize_ref(원본경로) → source_path.
+    #  · alias_to_source(별칭): alias_key(마지막 세그먼트 lower·공백/언더스코어→하이픈) → source_path.
+    #    충돌(같은 별칭 키 다수) 시 먼저 등록된 것 유지(first-wins) + 경고. 정확 키는 절대 별칭이 못 덮음.
     ref_to_source = {}
+    alias_to_source = {}
+    alias_owner = {}  # 별칭 키 → 최초 등록 relkey (경고용)
     for _p, _sub, category, _fn, slug, relkey in inputs:
         source_path = f"global/glen/{category}/{slug}"
         ref_to_source[relkey] = source_path
+        ak = alias_key(relkey)
+        if ak in alias_to_source:
+            if alias_to_source[ak] != source_path:
+                print(f"  WARN: 별칭 충돌 {ak!r}: {alias_owner[ak]!r} 유지, "
+                      f"{relkey!r} 무시(정확 일치는 각자 유효)")
+            continue  # first-wins
+        alias_to_source[ak] = source_path
+        alias_owner[ak] = relkey
 
     # 멱등: knowledge/global/glen/ 전체 재생성
     if os.path.isdir(OUT_BASE):
@@ -320,13 +367,14 @@ def main() -> int:
     os.makedirs(OUT_BASE, exist_ok=True)
 
     per_cat = {}
-    total_unresolved = 0
+    agg = {"unresolved": 0, "alias": 0, "related_alias": 0, "related_dropped": 0}
     written = 0
     for path, _sub, category, fn, slug, _relkey in inputs:
         meta, body = load_doc(path)
         title = derive_title(body, meta, fn)
-        content, unresolved = build_output(meta, body, title, ref_to_source)
-        total_unresolved += unresolved
+        content, stats = build_output(meta, body, title, ref_to_source, alias_to_source)
+        for k in agg:
+            agg[k] += stats.get(k, 0)
 
         out_dir = os.path.join(OUT_BASE, category)
         os.makedirs(out_dir, exist_ok=True)
@@ -340,7 +388,9 @@ def main() -> int:
     for cat in sorted(per_cat):
         print(f"  {cat}: {per_cat[cat]}")
     print(f"  합계: {written} 파일")
-    print(f"  미해소(강등) 위키링크: {total_unresolved}")
+    print("  ── 링크 해소 ──")
+    print(f"  본문: 별칭 복구 {agg['alias']} · 미해소(텍스트 강등) {agg['unresolved']}")
+    print(f"  관련(related): 별칭 복구 {agg['related_alias']} · 미시드(생략) {agg['related_dropped']}")
     print(f"  출력: {OUT_BASE}")
     return 0
 

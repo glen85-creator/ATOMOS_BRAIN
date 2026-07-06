@@ -46,6 +46,7 @@ E층은 draft-only였다: 슬롯 fan-out→CEO 합성→`synthesized_report`(exe
 
 - [[global/glen/decisions/2026-06-17-multislot-perstep-reconcile]]
 - [[global/glen/decisions/2026-06-15-5output-synthesis-delivery]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

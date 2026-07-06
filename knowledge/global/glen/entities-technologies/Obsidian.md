@@ -16,9 +16,9 @@ tags: [domain/knowledge-management, domain/notes, glen-wiki, type/technology]
 - **로컬 우선**: 모든 노트는 사용자 컴퓨터의 마크다운 파일. 클라우드 종속성 없음.
 - **위키링크**: `페이지명` 문법으로 페이지 간 연결. 그래프 뷰로 시각화.
 - **커뮤니티 플러그인**: 수많은 플러그인 생태계. 본 볼트가 쓰는 주요 플러그인:
-  - obsidian-git — Git 동기화·버전 관리
+  - [[global/glen/entities-technologies/obsidian-git]] — Git 동기화·버전 관리
   - Lean Terminal — 내장 터미널 (Obsidian 안에서 Claude Code 실행)
-  - Obsidian Web Clipper — 브라우저 확장과 연동해 웹 페이지를 마크다운으로 저장
+  - [[global/glen/entities-technologies/Obsidian-Web-Clipper]] — 브라우저 확장과 연동해 웹 페이지를 마크다운으로 저장
   - Dataview — frontmatter 기반 동적 쿼리 (본 볼트 `index.md`에서 사용)
 - **frontmatter**: YAML 메타데이터. type·tags·aliases 등으로 페이지 분류.
 

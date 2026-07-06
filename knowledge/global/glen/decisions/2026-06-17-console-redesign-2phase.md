@@ -42,6 +42,7 @@ diagnose→**2 진단스텝 완주**(워커 신규 태스크 등록 확인)→pr
 ## 관련
 
 - [[global/glen/decisions/2026-06-17-elayer-triage-flow]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

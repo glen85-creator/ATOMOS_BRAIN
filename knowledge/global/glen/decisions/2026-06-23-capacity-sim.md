@@ -22,7 +22,7 @@ tags: [domain/hbs, domain/simulation, status/active, priority/high, glen-wiki, t
 - **영수증/품목 timestamp 완비**: `sales_bills.bill_ordered_at` 78.2만행 · `sales_items.item_ordered_at` 116.9만행 (150매장·6개월·100% 실제 시각). → 2026-06-06 문서의 "bill_table_no 불가·시간대 데이터 없음"은 폐기. throughput/피크/capacity 모델링 가능.
 - **혼합형 매장**: dwell(`bill_paid_at`−`bill_ordered_at`) 중앙값 ≥10분 ~28매장(dine-in), <1분 ~51매장(퀵서비스, 주문≈결제). → 회전율·식사시간은 **dine-in 매장만 측정 가능, 퀵서비스는 가정**. 구로점=퀵서비스(0.7분).
 - **채널 분할 컬럼 신설**: `sales_closing.{dine_in,takeout,delivery}_{count,amount}` 존재(2026-06-06 "채널 분할 불가"도 정정). 단 **구로점은 전부 0**(미적재).
-- **신뢰도**: `sales_bills`(거래수·금액·시각) 신뢰 / `sales_closing.rep_sales_count`(객수) 만성 과소수집(2026-06-20-pos-sales-reconcile). 매출은 두 소스 정합(구로점 ₩20.98M ≈ 1,639건×₩12,879).
+- **신뢰도**: `sales_bills`(거래수·금액·시각) 신뢰 / `sales_closing.rep_sales_count`(객수) 만성 과소수집([[global/glen/decisions/2026-06-20-pos-sales-reconcile]]). 매출은 두 소스 정합(구로점 ₩20.98M ≈ 1,639건×₩12,879).
 - `store_master_v2.seat_count` 308중 130개만 채워짐, 구로점 NULL → 에디터 입력 필요.
 
 ## 결정 (Decision)
@@ -31,7 +31,7 @@ tags: [domain/hbs, domain/simulation, status/active, priority/high, glen-wiki, t
 2. **2D 에디터 (3D 보류)**: 점주가 테이블/좌석을 2D로 배치(드래그)·식사시간/회전율 가정 입력. 좌표는 capacity 수학엔 불필요하나 SP-D(주방 동선)·SP-E(인력 존) seam으로 저장. 3D는 모델링력 동일·빌드비용↑이라 보류.
 3. **데이터 모델 A2**: 신규 `store_layout`(매장 1:1, 가정값+측정캐시+캔버스) + `store_table`(테이블별 좌석·타입·x/y/w/h), RLS fail-closed. `store_master_v2`는 마스터 SSOT라 오염 회피 — 시드로만 읽음.
 4. **capacity 엔진 = 팀(party) 단위**: 천장(`party_slots×max_turns×util`)·타깃(회전율 가정)·실적(`bills_day×dine_ratio`) 3선 + 좌석효율(부차, `avg_party`로 인원 로스) + **병목 1차 분류기**(수요 제약/좌석 제약/주방 의심, 시간대 피크 분석). 단위 일관성 위해 좌석(인원)이 아닌 팀 단위 채택 — 매출·영수증이 팀 단위라 데이터 정직.
-5. **근거성(측정/가정 배지)**: 입력별 measured/assumed 표기. 구로점은 객단가=측정, 회전율·식사시간·dine-in비중=가정. (2026-06-22-atomos-console-detection-redesign의 검증 레이어 철학과 일치)
+5. **근거성(측정/가정 배지)**: 입력별 measured/assumed 표기. 구로점은 객단가=측정, 회전율·식사시간·dine-in비중=가정. ([[global/glen/decisions/2026-06-22-atomos-console-detection-redesign]]의 검증 레이어 철학과 일치)
 6. **API** `/api/sim/capacity/*` (기존 `/api/sim/*`·`/api/hq/sim/*`와 분리), 전부 FastAPI 경유.
 
 ## 결과 (Consequences)
@@ -99,6 +99,11 @@ Phase1 현대화 후 에디터 UX 피드백. 결정: (1) 좌석/주방 레이어
 배포: BE [FastAPI #65](https://github.com/glen85-creator/FastAPI/pull/65)→main `fe80e4b`(Railway; cost.py alloc CRUD + capacity_sim labor-config EP) · FE [hbs #72](https://github.com/glen85-creator/hbs-dashboard/pull/72)→main `e56c283`(Vercel; laborMath·LaborPanel·LaborCosts 역할입력). 실행=**subagent-driven**(컨트롤러가 마이그/워크트리/커밋/배포, 구현 subagent 5개가 코드+빌드/테스트, Task별 리뷰)+4-렌즈 적대리뷰(반영: `_validate_staff_id` sibling 일관성·정직성 caveat 3종). prod E2E: 배포 labor-config EP가 구로점 시드직원 2명 조인 정상 반환(month_hours=주당×4.345·allocs·labor_cost null→시급추정 폴백+caveat) 확인 후 테스트직원 삭제(staff_master 0 복원).
 
 ⚠️ 구로점 레시피 역할이 레거시 "직원/알바"(role code 아님)·staff_master 비어있음 → 실사용은 조리스텝 역할 갱신 + 직원·역할 입력 후. 후속: 시간대 시프트·weight 합 검증 강화·require_role(디퍼드 보안). spec/plan `hbs/docs/superpowers/{specs,plans}/2026-06-25-capacity-sp-e-labor-analysis*`.
+
+## 관련
+
+- [[global/glen/decisions/2026-06-20-pos-sales-reconcile]]
+- [[global/glen/decisions/2026-06-22-atomos-console-detection-redesign]]
 
 ## 출처(원본)
 

@@ -42,6 +42,7 @@ FINANCE/SCM 정식 슬롯 라이브·머지·E2E 입증. ATOMOS 정식 owner 슬
 
 - [[global/glen/decisions/2026-06-16-slot-reliability]]
 - [[global/glen/decisions/2026-06-12-atomos-execution-loop-and-org-direction]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

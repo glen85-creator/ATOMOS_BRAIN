@@ -40,6 +40,7 @@ sales 3슬롯 fan-out 라이브·`ELAYER_SALES_MARKETING_ENABLED` ON. E층 "5산
 
 - [[global/glen/decisions/2026-06-15-5output-synthesis-delivery]]
 - [[global/glen/decisions/2026-06-15-ceo-direct-llm-fallback]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

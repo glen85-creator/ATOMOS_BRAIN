@@ -40,6 +40,7 @@ CEO 동적 분해 라이브·`ELAYER_CEO_DECOMPOSE_ENABLED` ON. 게이트 3역�
 
 - [[global/glen/decisions/2026-06-15-sales-marketing-slot]]
 - [[global/glen/decisions/2026-06-15-ceo-gate-v1-flag-off-harden]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

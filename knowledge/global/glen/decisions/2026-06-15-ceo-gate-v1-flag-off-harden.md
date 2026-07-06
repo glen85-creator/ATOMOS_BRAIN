@@ -43,6 +43,7 @@ CEO 게이트 **ON·라이브**(deepseek, persistSession=false, resting paused, 
 ## 관련
 
 - [[global/glen/decisions/2026-06-12-atomos-execution-loop-and-org-direction]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 

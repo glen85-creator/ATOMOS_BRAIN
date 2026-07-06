@@ -40,6 +40,7 @@ CRM 정식 슬롯 라이브·머지·E2E 입증. ATOMOS 정식 owner 6/6 완성.
 
 - [[global/glen/decisions/2026-06-17-finance-scm-slots]]
 - [[global/glen/decisions/2026-06-17-elayer-send-email]]
+- [[global/glen/entities-projects/HBS-Dashboard]]
 
 ## 출처(원본)
 
