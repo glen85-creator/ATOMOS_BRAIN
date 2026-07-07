@@ -20,8 +20,9 @@ ATOMOS BRAIN  (scope = ATOMOS 고유 구조)
 │   ├ (playbooks·규칙·개념)   grounding-rules 등 ATOMOS 운영 공용 지식
 │   └ glen/          글렌 위키 참조지식 86 (출처 격리 · 재시드 깔끔)
 ├ dept/{도메인}/      부서 도메인 지식 (sales·cost·cogs…)  — 도메인 플레이북 (anomaly-playbook 등)
-├ brand/{브랜드}/     브랜드 전략·지식        ┐ S3 MRI·S4 프로젝트가
-└ store/{매장}/       매장 프로필·인사이트·프로젝트 결과보고서 ┘ 큐레이션 승격 (현재 빈 자리)
+└ brand/{브랜드}/     브랜드 전략·지식
+    └ {매장}/{YYYY-MM}/{YYYY-MM-DD}/   매장 프로필·인사이트·프로젝트 종료 보고서
+                                       (S4 큐레이션 승격 — 브랜드 > 매장 > 월 > 일자 중첩, 일자=프로젝트 종료일)
 ```
 
 **핵심 원칙:**
@@ -53,7 +54,10 @@ scope 체계·승격 규칙 박제 — S3/S4가 참조.
 
 - **store: 승격 대상**: 매장 프로필(고정 정보)·프로젝트 종료 효과보고서·반복 재사용될 큰 인사이트. 매일 저널은 제외(테이블에만).
 - **brand: 승격 대상**: 브랜드 전략·브랜드 공통 플레이북·브랜드 단위 인사이트.
-- **승격 주체**: S4 프로젝트 종료 시 결과보고서를 `store:{매장}` 또는 `brand:{브랜드}` scope의 knowledge 문서로 생성(파일→DB seed 동일 경로). read_tier·read_roles는 대상에 맞게.
+- **승격 주체**: S4 프로젝트 종료 시 결과보고서를 knowledge 문서로 생성(파일→DB seed 동일 경로). read_tier·read_roles는 대상에 맞게.
+  - **경로(트리 표시)**: `knowledge/brand/{br_id}/{st_id}/{YYYY-MM}/{YYYY-MM-DD}/project-{id}.md` — 브랜드 > 매장 > 월 > 일자 중첩(일자=프로젝트 종료일 period_end). *(구현: `brain_promote.build_knowledge_md`, spec `2026-07-07-brain-tree-hierarchy-design.md`.)*
+  - **scope 필드(접근 제어)**: `store:{st_id}`(또는 brand 단위면 `brand:{br_id}`) — 경로와 별개 관심사. 트리는 경로 기준, 접근은 scope 기준.
+  - **표시**: 트리 세그먼트는 한글 라벨(전사 공용·부서·브랜드·매장 등)·ID→이름·월/일자 한글·문서는 한글 제목(FE `brainLabel.ts`).
 - **저널→BRAIN 직접 승격 금지**: 저널은 원자료. 승격은 "사람/CEO가 가치 판단한 산물"만.
 
 ## 6. 검증
