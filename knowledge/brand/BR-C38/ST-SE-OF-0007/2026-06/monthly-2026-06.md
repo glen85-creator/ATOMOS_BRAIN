@@ -19,5 +19,8 @@ tags: [domain/sales, kind/monthly-report]
 ## 종료 프로젝트
 - 없음
 
+## 연결
+- [[global/glen/entities-organizations/청년38국수]]
+
 ## 메모
 - 수치는 저널·프로젝트 원본 기준. 데이터 부족 항목은 명시(위조 없음).
