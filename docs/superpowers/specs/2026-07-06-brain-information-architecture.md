@@ -20,13 +20,14 @@ ATOMOS BRAIN  (scope = ATOMOS 고유 구조)
 │   ├ (playbooks·규칙·개념)   grounding-rules 등 ATOMOS 운영 공용 지식
 │   └ glen/          글렌 위키 참조지식 86 (출처 격리 · 재시드 깔끔)
 ├ dept/{도메인}/      부서 도메인 지식 (sales·cost·cogs…)  — 도메인 플레이북 (anomaly-playbook 등)
-└ brand/{브랜드}/     브랜드 전략·지식
-    └ {매장}/{YYYY-MM}/{YYYY-MM-DD}/   매장 프로필·인사이트·프로젝트 종료 보고서
-                                       (S4 큐레이션 승격 — 브랜드 > 매장 > 월 > 일자 중첩, 일자=프로젝트 종료일)
+└ brand/{브랜드}/     브랜드 전략·지식·플레이북 (브랜드 직하)
+    └ {매장}/
+        └ {YYYY-MM}/         프로젝트 결과보고서·(향후)월 리포트   ← 파일(큐레이션 승격·년월 직하)
+            └ {YYYY-MM-DD}/  그날 매일 저널                       ← store_journal DB(트리가 표시·파일 아님)
 ```
 
 **핵심 원칙:**
-- **큐레이션 승격 모델**: 매일 저널(`store_journal` 테이블, 자동)은 BRAIN에 넣지 않는다. "지속 가치 있는 것"(프로젝트 종료 보고서·큰 인사이트·매장 프로필)만 `store:`/`brand:` scope로 승격. BRAIN=안정 지식, 저널=흐르는 기록.
+- **통합 뷰 + 큐레이션 승격**: 위키 트리는 **통합 뷰**다 — (a)매일 저널(`store_journal` DB, 자동)을 월일자에 *읽어서 표시*(파일 승격 아님·DB-first 유지: 볼륨·구조·기계검색 그대로) + (b)"지속 가치 있는 것"(프로젝트 결과·큰 인사이트·매장/브랜드 지식)만 파일로 큐레이션 승격(년월/브랜드 직하). 저널=흐르는 기록(DB)·큐레이션 지식=안정(파일). 상세 `2026-07-07-brain-unified-tree-design.md`.
 - **출처 격리**: GLEN_WORK(참조지식)는 `global/glen`에 격리 — ATOMOS 운영지식(파이프라인이 채우는 dept/brand/store)과 안 섞이고, GLEN_WORK 업데이트 시 재시드 깔끔.
 - **저장 = 파일(SSOT) + DB(색인)** (glen-wiki-seed 설계 §2 그대로).
 
@@ -55,7 +56,7 @@ scope 체계·승격 규칙 박제 — S3/S4가 참조.
 - **store: 승격 대상**: 매장 프로필(고정 정보)·프로젝트 종료 효과보고서·반복 재사용될 큰 인사이트. 매일 저널은 제외(테이블에만).
 - **brand: 승격 대상**: 브랜드 전략·브랜드 공통 플레이북·브랜드 단위 인사이트.
 - **승격 주체**: S4 프로젝트 종료 시 결과보고서를 knowledge 문서로 생성(파일→DB seed 동일 경로). read_tier·read_roles는 대상에 맞게.
-  - **경로(트리 표시)**: `knowledge/brand/{br_id}/{st_id}/{YYYY-MM}/{YYYY-MM-DD}/project-{id}.md` — 브랜드 > 매장 > 월 > 일자 중첩(일자=프로젝트 종료일 period_end). *(구현: `brain_promote.build_knowledge_md`, spec `2026-07-07-brain-tree-hierarchy-design.md`.)*
+  - **경로(트리 표시)**: `knowledge/brand/{br_id}/{st_id}/{YYYY-MM}/project-{id}.md` — 프로젝트 결과는 **년월 직하**(일자 폴더는 매일 저널 전용·저널은 store_journal DB에서 트리가 직접 표시). *(구현: `brain_promote.build_knowledge_md`, spec `2026-07-07-brain-tree-hierarchy-design.md`·`2026-07-07-brain-unified-tree-design.md`.)*
   - **scope 필드(접근 제어)**: `store:{st_id}`(또는 brand 단위면 `brand:{br_id}`) — 경로와 별개 관심사. 트리는 경로 기준, 접근은 scope 기준.
   - **표시**: 트리 세그먼트는 한글 라벨(전사 공용·부서·브랜드·매장 등)·ID→이름·월/일자 한글·문서는 한글 제목(FE `brainLabel.ts`).
 - **저널→BRAIN 직접 승격 금지**: 저널은 원자료. 승격은 "사람/CEO가 가치 판단한 산물"만.
