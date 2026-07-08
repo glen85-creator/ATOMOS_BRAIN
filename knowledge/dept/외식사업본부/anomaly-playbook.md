@@ -1,5 +1,5 @@
 ---
-scope: dept:sales
+scope: dept:외식사업본부
 read_tier: ATOMOS_MASTER
 read_roles: [ANALYST]
 title: 매출 급락 대응 플레이북 (D-SALES)
